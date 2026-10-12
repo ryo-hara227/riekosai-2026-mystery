@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#ffe27b">
+  <meta name="description" content="ファン有志によるヒーロー謎解き企画・EASY編。">
+  <title>HEROES - EASY | ヒーロー、出動できません！</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script defer src="./data/easy.js"></script>
+  <script defer src="./app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">本文へ移動</a>
+  <div class="background-art" aria-hidden="true"></div>
+  <div class="background-art background-art--dots" aria-hidden="true"></div>
+
+  <div class="site-shell">
+    <header class="site-header">
+      <a class="wordmark" href="./index.html" aria-label="HEROES トップへ">
+        <span class="wordmark__bolt" aria-hidden="true">★</span>
+        <span>HERO<span class="wordmark__highlight">ES!</span></span>
+      </a>
+      <span class="site-header__tag">HERO PUZZLE PROJECT <small>/ TEST BUILD 01</small></span>
+    </header>
+
+    <main id="main">
+      <section id="homeScreen" class="screen" aria-labelledby="homeTitle">
+        <div class="cover" aria-label="ヒーロー謎解き企画タイトル">
+          <div class="cover__kicker">RI-E-KO FEST INSPIRED / FAN MADE</div>
+          <div class="cover__headline"><span class="cover__first">誰かの</span><strong id="homeTitle">ヒーローに<br>なれるかも。</strong></div>
+          <p class="cover__description">今日はヒーローたちのお祭り。<br>なのに、なんだか事件の予感……？</p>
+          <div class="cover__sticker" aria-hidden="true">MISSION<br>START!</div>
+        </div>
+
+        <section class="mission-select" aria-label="ミッション選択">
+          <div class="section-heading"><span class="section-heading__rule"></span><h2>CHOOSE YOUR MISSION!</h2><span class="section-heading__rule"></span></div>
+          <div class="mission-grid">
+            <article class="mission-card mission-card--easy">
+              <div class="mission-card__meta"><span class="mission-pill">01 / EASY</span><span class="mission-card__duration">約15分</span></div>
+              <h3>ヒーロー、<br>出動できません！</h3>
+              <p>エコーの変身バッジがなくなった！ 新人助手として、ショーが始まる前に探し出そう。</p>
+              <div class="mission-card__progress" id="homeProgress">未挑戦</div>
+              <div class="mission-card__actions">
+                <button type="button" id="startBtn" class="btn btn--red">最初から遊ぶ <span aria-hidden="true">→</span></button>
+                <button type="button" id="resumeBtn" class="btn btn--outline" hidden>続きから再開 <span aria-hidden="true">→</span></button>
+              </div>
+            </article>
+            <article class="mission-card mission-card--planned">
+              <div class="mission-card__meta"><span class="mission-pill">02 / NORMAL</span><span>COMING SOON</span></div>
+              <h3>緊急指令！<br>街を守れ！</h3><p>街のSOSをつなげる、通信オペレーターの物語。</p>
+              <span class="mission-card__coming">シナリオ準備中</span>
+            </article>
+            <article class="mission-card mission-card--planned">
+              <div class="mission-card__meta"><span class="mission-pill">03 / HARD</span><span>COMING SOON</span></div>
+              <h3>名もなき<br>ヒーロー</h3><p>みんなのヒーローには、なれなくても。</p>
+              <span class="mission-card__coming">シナリオ準備中</span>
+            </article>
+            <article class="mission-card mission-card--planned mission-card--extra">
+              <div class="mission-card__meta"><span class="mission-pill">EXTRA</span><span>LOCKED</span></div>
+              <h3>最後のSOS</h3><p>3つの合言葉から始まる、最後のミッション。</p>
+              <span class="mission-card__coming">EASY・NORMAL・HARD完成後に実装</span>
+            </article>
+          </div>
+        </section>
+        <p class="notice">※ テスト版です。現在プレイできるのはEASYのみです。過去の謎解き企画やメッセージボードとは別の進捗として保存されます。</p>
+      </section>
+
+      <section id="playScreen" class="screen" aria-labelledby="playTitle" hidden>
+        <div class="play-toolbar">
+          <button type="button" id="homeBtn" class="btn btn--subtle">← ミッション選択</button>
+          <span class="play-toolbar__badge">EASY / 15 MIN</span>
+        </div>
+        <div class="play-banner">
+          <div class="play-banner__mini">HERO MISSION 01</div>
+          <h1 id="playTitle">ヒーロー、出動できません！</h1>
+          <div class="progress-header"><span id="stepLabel">ページ 1 / 15</span><span id="stepPercent">7%</span></div>
+          <div class="progress-track" aria-hidden="true"><div id="progressBar" class="progress-fill"></div></div>
+        </div>
+        <article class="page-panel" id="pagePanel" aria-live="polite" aria-atomic="true"></article>
+        <nav class="page-nav" aria-label="物語のページ送り">
+          <button id="prevBtn" class="btn btn--outline" type="button">← 前へ</button>
+          <button id="nextBtn" class="btn btn--red" type="button">次へ →</button>
+        </nav>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>ファン有志による非公式の創作企画です。実在のイベント主催者・出演者・関係者による公式サイトではありません。</p>
+      <button type="button" id="resetBtn" class="reset-link">この端末のテスト進捗をリセット</button>
+    </footer>
+  </div>
+
+  <dialog id="imageDialog" class="image-dialog" aria-label="問題画像の拡大表示">
+    <div class="image-dialog__head"><span>画像を拡大表示</span><button type="button" id="closeImageBtn" class="btn btn--outline">閉じる ✕</button></div>
+    <img id="enlargedImage" src="" alt="">
+  </dialog>
+</body>
+</html>
