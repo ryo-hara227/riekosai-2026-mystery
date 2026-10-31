@@ -4,10 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#ffe27b">
-  <meta name="description" content="ファン有志によるヒーロー謎解き企画・EASY編。">
-  <title>HEROES - EASY | ヒーロー、出動できません！</title>
+  <meta name="description" content="ファン有志によるヒーロー謎解き企画。EASY編・NORMAL編の試作版。">
+  <title>HEROES! | ヒーロー謎解き企画</title>
   <link rel="stylesheet" href="./styles.css">
   <script defer src="./data/easy.js"></script>
+  <script defer src="./data/normal.js"></script>
   <script defer src="./app.js"></script>
 </head>
 <body>
@@ -21,7 +22,7 @@
         <span class="wordmark__bolt" aria-hidden="true">★</span>
         <span>HERO<span class="wordmark__highlight">ES!</span></span>
       </a>
-      <span class="site-header__tag">HERO PUZZLE PROJECT <small>/ TEST BUILD 01</small></span>
+      <span class="site-header__tag">HERO PUZZLE PROJECT <small>/ TEST BUILD 02</small></span>
     </header>
 
     <main id="main">
@@ -46,10 +47,15 @@
                 <button type="button" id="resumeBtn" class="btn btn--outline" hidden>続きから再開 <span aria-hidden="true">→</span></button>
               </div>
             </article>
-            <article class="mission-card mission-card--planned">
-              <div class="mission-card__meta"><span class="mission-pill">02 / NORMAL</span><span>COMING SOON</span></div>
-              <h3>緊急指令！<br>街を守れ！</h3><p>街のSOSをつなげる、通信オペレーターの物語。</p>
-              <span class="mission-card__coming">シナリオ準備中</span>
+            <article class="mission-card mission-card--normal">
+              <div class="mission-card__meta"><span class="mission-pill">02 / NORMAL</span><span class="mission-card__duration">約15分</span></div>
+              <h3>緊急指令！<br>街を守れ！</h3>
+              <p>通信ログが読めない！ 新人オペレーターとして、最新のSOSを解読してヒーローへ届けよう。</p>
+              <div class="mission-card__progress" id="normalHomeProgress">未挑戦</div>
+              <div class="mission-card__actions">
+                <button type="button" id="normalStartBtn" class="btn btn--blue">最初から遊ぶ <span aria-hidden="true">→</span></button>
+                <button type="button" id="normalResumeBtn" class="btn btn--outline" hidden>続きから再開 <span aria-hidden="true">→</span></button>
+              </div>
             </article>
             <article class="mission-card mission-card--planned">
               <div class="mission-card__meta"><span class="mission-pill">03 / HARD</span><span>COMING SOON</span></div>
@@ -63,16 +69,19 @@
             </article>
           </div>
         </section>
-        <p class="notice">※ テスト版です。現在プレイできるのはEASYのみです。過去の謎解き企画やメッセージボードとは別の進捗として保存されます。</p>
+        <p class="notice">※ テスト版です。現在プレイできるのはEASY・NORMALの試作版です。過去の謎解き企画やメッセージボードとは別の進捗として保存されます。</p>
       </section>
 
       <section id="playScreen" class="screen" aria-labelledby="playTitle" hidden>
         <div class="play-toolbar">
           <button type="button" id="homeBtn" class="btn btn--subtle">← ミッション選択</button>
-          <span class="play-toolbar__badge">EASY / 15 MIN</span>
+          <div class="play-toolbar__right">
+            <button type="button" id="logBtn" class="btn btn--subtle" hidden>通信ログを確認</button>
+            <span class="play-toolbar__badge" id="courseBadge">EASY / 15 MIN</span>
+          </div>
         </div>
         <div class="play-banner">
-          <div class="play-banner__mini">HERO MISSION 01</div>
+          <div class="play-banner__mini" id="courseMini">HERO MISSION 01</div>
           <h1 id="playTitle">ヒーロー、出動できません！</h1>
           <div class="progress-header"><span id="stepLabel">ページ 1 / 15</span><span id="stepPercent">7%</span></div>
           <div class="progress-track" aria-hidden="true"><div id="progressBar" class="progress-fill"></div></div>
