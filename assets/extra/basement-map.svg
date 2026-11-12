@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" role="img" aria-labelledby="title desc">
+<title id="title">旧校舎地下・設備通信図（仮図面）</title><desc id="desc">西階段から地下機械室、赤い扉の先の隠し制御室、東側保守通路を経て中継器09へ。中継器09の周辺は未登録区画で正確な部屋と入口は未確定。</desc>
+<defs><pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0V24" fill="none" stroke="#c7dce5" stroke-width=".7"/></pattern></defs>
+<rect width="1000" height="560" rx="16" fill="#f1f8fb"/><rect x="16" y="16" width="968" height="528" fill="url(#grid)"/>
+<g font-family="sans-serif" fill="#173b53"><text x="40" y="54" font-size="24" font-weight="bold">響ヶ丘学園 旧校舎 B1</text><text x="40" y="82" font-size="15">設備通信図 / 仮図面・縮尺なし</text>
+<path d="M110 284H880M110 284V444H496M290 160V428M496 160V428M700 160V428" fill="none" stroke="#b5cfdb" stroke-width="42"/>
+<g fill="#fff" stroke="#315c75" stroke-width="3"><rect x="40" y="156" width="138" height="90" rx="6"/><rect x="218" y="118" width="146" height="108" rx="6"/><rect x="422" y="118" width="148" height="108" rx="6"/><rect x="218" y="360" width="146" height="116" rx="6"/><rect x="422" y="360" width="148" height="116" rx="6"/></g>
+<g font-size="19" text-anchor="middle"><text x="109" y="193">西階段</text><text x="291" y="157">地下機械室</text><text x="496" y="157">隠し制御室</text><text x="291" y="399">配電室</text><text x="496" y="399">点検庫</text></g>
+<path d="M364 172H421" stroke="#c24b4b" stroke-width="10"/><text x="393" y="205" font-size="14" text-anchor="middle">赤い扉</text>
+<rect x="635" y="118" width="308" height="358" rx="8" fill="#f3e4c9" fill-opacity=".9" stroke="#b78a43" stroke-width="3" stroke-dasharray="9 7"/>
+<text x="788" y="161" text-anchor="middle" font-size="22" font-weight="bold">未登録区画</text><text x="788" y="188" text-anchor="middle" font-size="15">部屋・入口は照合できていない</text>
+<path d="M570 172H614V285H696" fill="none" stroke="#315c75" stroke-width="4" stroke-dasharray="8 6"/><text x="604" y="321" font-size="15">東側保守通路</text>
+<circle cx="495" cy="184" r="150" fill="#2e92ac" fill-opacity=".07" stroke="#2e92ac" stroke-dasharray="7 6"/>
+<text x="400" y="345" font-size="14">近距離信号の概念範囲</text>
+<g fill="#236d91" stroke="#fff" stroke-width="2"><circle cx="110" cy="284" r="21"/><circle cx="110" cy="444" r="21"/><circle cx="291" cy="284" r="21"/><circle cx="496" cy="284" r="21"/><circle cx="291" cy="444" r="21"/><circle cx="496" cy="444" r="21"/><circle cx="496" cy="184" r="21"/><circle cx="700" cy="284" r="24"/></g>
+<g fill="#fff" font-size="16" text-anchor="middle" font-weight="bold"><text x="110" y="290">02</text><text x="110" y="450">03</text><text x="291" y="290">05</text><text x="496" y="290">08</text><text x="291" y="450">04</text><text x="496" y="450">07</text><text x="496" y="190">06</text><text x="700" y="290">09</text></g>
+<g font-size="14"><text x="737" y="283">共通の最終中継器</text><text x="737" y="306">現在地の証明ではない</text><text x="40" y="510">● 中継器番号　 ━ 赤い扉　 ┄ 記録から推定した設備接続</text><text x="40" y="533">※ 受信機1台では方向・距離を測れない。円は実際の測位範囲ではありません。</text></g></g></svg>

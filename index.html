@@ -4,13 +4,16 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#ffe27b">
-  <meta name="description" content="ファン有志によるヒーロー謎解き企画。EASY・NORMAL・HARD編の試作版。">
+  <meta name="description" content="HEROES! EASY・NORMAL・HARDとEXTRA『ヒーローが消えた夜』の試作版。">
   <title>HEROES! | ヒーロー謎解き企画</title>
-  <link rel="stylesheet" href="./styles.css?v=3">
+  <link rel="stylesheet" href="./styles.css?v=4-extra1">
+  <link rel="stylesheet" href="./extra.css?v=4-extra1">
   <script defer src="./data/easy.js?v=3"></script>
   <script defer src="./data/normal.js?v=3"></script>
   <script defer src="./data/hard.js?v=3"></script>
-  <script defer src="./app.js?v=3"></script>
+  <script defer src="./data/extra.js?v=4-extra1"></script>
+  <script defer src="./extra-ui.js?v=4-extra1"></script>
+  <script defer src="./app.js?v=4-extra1"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">本文へ移動</a>
@@ -23,7 +26,7 @@
         <span class="wordmark__bolt" aria-hidden="true">★</span>
         <span>HERO<span class="wordmark__highlight">ES!</span></span>
       </a>
-      <span class="site-header__tag">HERO PUZZLE PROJECT <small>/ TEST BUILD 03</small></span>
+      <span class="site-header__tag">HERO PUZZLE PROJECT <small>/ EXTRA PROTOTYPE 01</small></span>
     </header>
 
     <main id="main">
@@ -68,14 +71,19 @@
                 <button type="button" id="hardResumeBtn" class="btn btn--outline" hidden>続きから再開 <span aria-hidden="true">→</span></button>
               </div>
             </article>
-            <article class="mission-card mission-card--planned mission-card--extra">
-              <div class="mission-card__meta"><span class="mission-pill">EXTRA</span><span>LOCKED</span></div>
+            <article class="mission-card mission-card--extra">
+              <div class="mission-card__meta"><span class="mission-pill">04 / EXTRA</span><span>試作版</span></div>
               <h3>ヒーローが消えた夜</h3><p>後夜祭で相次ぐヒーローの失踪。HERO LINKの弱点に迫れ。</p>
-              <span class="mission-card__coming">EXTRAは構想・作問中</span>
+              <div class="mission-card__progress" id="extraHomeProgress">未挑戦</div>
+              <div class="mission-card__actions">
+                <button type="button" id="extraStartBtn" class="btn btn--night">EXTRAを開く →</button>
+                <button type="button" id="extraResumeBtn" class="btn btn--outline" hidden>続きから再開 →</button>
+              </div>
+              <span class="prototype-tag">Third / LAST・扉コードの一部は仮実装</span>
             </article>
           </div>
         </section>
-        <p class="notice">※ テスト版です。現在プレイできるのはEASY・NORMAL・HARDの試作版です。過去の謎解き企画やメッセージボードとは別の進捗として保存されます。</p>
+        <p class="notice">※ テスト版です。EXTRAはE/N/Hの合言葉で解禁できます。試遊用の解禁操作も用意しています。未完成部分は「仮実装」と表示し、進捗はこのブラウザに保存します。</p>
         <section class="home-guidance" aria-label="遊ぶ前に">
           <details><summary>遊び方</summary><p>好きな難易度を選び、問題を解いて進みます。迷ったときはヒントを開けます。HARDは一枚の大きな探索マップを追って解く形式です。</p></details>
           <details><summary>あらすじ</summary><p>2026年11月29日、響ヶ丘学園祭。ヒーローたちが活躍する街で、次々と事件が起きています。HERO LINKに届くミッションを解決しましょう。</p></details>
