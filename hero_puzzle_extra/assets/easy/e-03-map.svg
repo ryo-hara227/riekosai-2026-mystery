@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 810" role="img" aria-labelledby="title desc">
+<title id="title">響ヶ丘学園祭 会場マップ</title>
+<desc id="desc">上に北門、下に南門、中央に南北のメイン通路。左に青い体験教室が二つと紫のゲームコーナーが二つ、右に青い案内所と緑色のメインステージがある。</desc>
+<defs>
+ <pattern id="dots" width="16" height="16" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="1.6" fill="#d5c7ad"/></pattern>
+ <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="#342b28" flood-opacity=".15"/></filter>
+ <pattern id="grass" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M4 18l4-7 3 7m1-2 3-8 5 10" fill="none" stroke="#aeddb4" stroke-width="2" opacity=".6"/></pattern>
+</defs>
+<rect x="0" y="0" width="1200" height="810" rx="22" fill="#fffbeb"/>
+<rect x="19" y="20" width="1162" height="770" rx="18" fill="url(#dots)" opacity=".34"/>
+<rect x="40" y="24" width="1120" height="72" rx="17" fill="#12395e"/>
+<text x="600" y="72" text-anchor="middle" fill="white" font-size="35" font-weight="900" font-family="'Noto Sans JP',sans-serif">響ヶ丘学園祭　会場マップ</text>
+<!-- paths / grounds -->
+<rect x="54" y="108" width="1092" height="598" rx="23" fill="#dfefd5" stroke="#99bb91" stroke-width="4"/>
+<rect x="54" y="108" width="1092" height="598" rx="23" fill="url(#grass)"/>
+<rect x="546" y="107" width="105" height="599" rx="18" fill="#bbc2cb" stroke="#808d9d" stroke-width="4"/>
+<rect x="542" y="108" width="9" height="599" fill="#7f8995" opacity=".35"/>
+<path d="M545 451H1140" stroke="#bbc2cb" stroke-width="49"/>
+<path d="M545 451H1140" stroke="#808d9d" stroke-width="3" stroke-dasharray="10 11" opacity=".9"/>
+<path d="M355 298H546" stroke="#bbc2cb" stroke-width="41"/>
+<!-- some bushes -->
+<g fill="#81b77f" opacity=".85"><circle cx="97" cy="135" r="21"/><circle cx="129" cy="137" r="25"/><circle cx="1113" cy="160" r="24"/><circle cx="1081" cy="170" r="20"/><circle cx="92" cy="660" r="28"/><circle cx="1125" cy="664" r="25"/><circle cx="103" cy="422" r="19"/><circle cx="1140" cy="337" r="19"/></g>
+<!-- north gate -->
+<rect x="535" y="103" width="127" height="54" rx="10" fill="#fff8dd" stroke="#3e4650" stroke-width="3" filter="url(#shadow)"/>
+<text x="600" y="139" text-anchor="middle" font-family="sans-serif" font-size="28" font-weight="900" fill="#253341">北門</text>
+<path d="M600 158v27" stroke="#253341" stroke-width="4" stroke-linecap="round"/><path d="m590 176 10 13 10-13" fill="none" stroke="#253341" stroke-width="4"/>
+<!-- structures -->
+<g filter="url(#shadow)" font-family="'Noto Sans JP',sans-serif" font-weight="900" text-anchor="middle">
+ <rect x="170" y="126" width="234" height="65" rx="12" fill="#2e8248" stroke="#10502e" stroke-width="4"/>
+ <text x="287" y="168" fill="white" font-size="23">迷子受付</text>
+ <rect x="90" y="233" width="310" height="128" rx="16" fill="#45a33b" stroke="#176d38" stroke-width="5"/>
+ <text x="245" y="289" fill="white" font-size="27">野外ステージ</text>
+ <text x="245" y="324" fill="white" font-size="20">（赤いリストバンド）</text>
+ <rect x="408" y="204" width="120" height="69" rx="10" fill="#14a2dc" stroke="#086ea2" stroke-width="4"/>
+ <text x="468" y="230" font-size="17" fill="white">体験教室</text><text x="468" y="254" font-size="19" fill="white">A</text>
+ <rect x="408" y="287" width="120" height="69" rx="10" fill="#14a2dc" stroke="#086ea2" stroke-width="4"/>
+ <text x="468" y="312" font-size="17" fill="white">体験教室</text><text x="468" y="339" font-size="19" fill="white">B</text>
+ <rect x="675" y="224" width="155" height="70" rx="10" fill="#166e94" stroke="#074a75" stroke-width="4"/>
+ <text x="752" y="252" fill="white" font-size="20">案内所</text><text x="752" y="276" fill="white" font-size="16">（受付）</text>
+ <rect x="396" y="404" width="132" height="71" rx="11" fill="#a53da7" stroke="#71207c" stroke-width="4"/>
+ <text x="462" y="433" fill="white" font-size="17">ゲーム</text><text x="462" y="455" fill="white" font-size="17">コーナー1</text>
+ <rect x="396" y="489" width="132" height="71" rx="11" fill="#a53da7" stroke="#71207c" stroke-width="4"/>
+ <text x="462" y="519" fill="white" font-size="17">ゲーム</text><text x="462" y="542" fill="white" font-size="17">コーナー2</text>
+ <rect x="752" y="375" width="352" height="218" rx="17" fill="#53a637" stroke="#1a7541" stroke-width="6"/>
+ <text x="928" y="461" fill="white" font-size="37">メイン</text><text x="928" y="506" fill="white" font-size="37">ステージ</text>
+ <text x="928" y="548" fill="white" font-size="22">（青いリストバンド）</text>
+ <rect x="153" y="405" width="151" height="66" rx="10" fill="#f18535" stroke="#b55514" stroke-width="4"/>
+ <text x="229" y="445" fill="white" font-size="22">屋台 1</text>
+ <rect x="153" y="504" width="151" height="66" rx="10" fill="#f18535" stroke="#b55514" stroke-width="4"/>
+ <text x="229" y="545" fill="white" font-size="22">屋台 2</text>
+ <rect x="694" y="611" width="171" height="66" rx="10" fill="#19688c" stroke="#064765" stroke-width="4"/>
+ <text x="779" y="653" fill="white" font-size="23">出演者控室</text>
+</g>
+<!-- south gate -->
+<rect x="535" y="672" width="127" height="50" rx="9" fill="#fff8dd" stroke="#3e4650" stroke-width="3" filter="url(#shadow)"/>
+<text x="600" y="705" text-anchor="middle" font-family="sans-serif" font-size="26" font-weight="900" fill="#253341">南門</text>
+<text x="58" y="756" font-family="sans-serif" font-size="22" font-weight="700" fill="#384b52">※ 会場の建物・通路・リストバンドはこの謎用の架空の設定です。</text>
+</svg>
