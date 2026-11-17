@@ -42,7 +42,7 @@
   }
   function hints(c,target,entries){const box=c.el('div','hints');entries.forEach((text,i)=>{const d=c.el('details');d.append(c.el('summary','',`ヒント${i+1}`),c.el('p','',text));box.append(d);});target.append(box);}
   function unlock(page,target,c){
-    target.append(c.el('p','extra-lead','EASY・NORMAL・HARDで集めた3つの合言葉を入力してください。'));
+    target.append(c.el('p','extra-lead','EASY・NORMAL・HARDをすべてクリアすると、自動でEXTRAが解放されます。旧版の合言葉でも進めます。'));
     const f=formBase(c,target,page.id);const grid=c.el('div','extra-answers');const inputs=['EASYの合言葉','NORMALの合言葉','HARDの合言葉'].map((label,i)=>{const x=field(c,f,'word'+i,label);grid.append(x.box);return x.input;});f.append(grid);submitButton(c,f,'合言葉を照合する →');const fb=feedback(c);f.append(fb);
     f.addEventListener('submit',e=>{e.preventDefault();if(inputs.every((x,i)=>good(c,x.value,[D.unlock[i]]))){c.complete(page.id,inputs.map(x=>x.value));lockForm(c,page,f,fb,'EXTRA解禁！ 次へ進めます。');}else fb.textContent='合言葉をもう一度確認してください。E/N/Hのクリア画面に表示されています。';});
     const all=['easy','normal','hard'].every(id=>c.loadSave(id).cleared);
@@ -53,8 +53,9 @@
     dev.append(button(c,'試遊用にEXTRAを解禁する',()=>{c.complete(page.id,['prototype-unlock']);state(c).trialUnlock=true;c.persist();lockForm(c,page,f,fb,'試遊用に解禁しました。次へ進めます。');}));target.append(dev);
   }
   function first(page,target,c){
+    (page.paragraphs||[]).forEach(p=>target.append(c.el('p','',p)));
     const mail=c.el('section','extra-mail');const head=c.el('header');head.append(c.el('strong','','差出人：エコー → マネージャー'),c.el('span','','件名：もし、私と連絡が取れなくなったら'));
-    mail.append(head,c.el('blockquote','','「HERO LINKには載せられない。4つのヒントを残す。番号も、番号と同じ数字も消えている。前の事件で見つけたエラーは、まだ直っていない。どうか、私たちを見つけて」'));target.append(mail);
+    mail.append(head,c.el('blockquote','','「変な指令が続いてる。もし私と連絡が取れなくなったら、添付の資料を調べて。今日、手伝ってくれたあの人なら、きっと気づいてくれると思う」'));target.append(mail);
     const assets=[{id:'A',files:['ex01_1.png']},{id:'B',files:['ex01_2-1.png','ex01_2-2.png']},{id:'C',files:['ex01_3-1.png','ex01_3-2.png']},{id:'D',files:['ex01_4.png']}];
     tabs(c,target,assets.map(a=>({id:a.id,label:'資料 '+a.id,render:panel=>{panel.append(c.el('h3','','添付資料 '+a.id));const stack=c.el('div','extra-image-stack');a.files.forEach((src,i)=>stack.append(c.makeImage('assets/extra/'+src,`資料${a.id} ${i+1}`)));panel.append(stack);}})),'firstTab');
     const f=formBase(c,target,page.id);f.append(c.el('h3','','消えた番号を戻す'),c.el('p','extra-footer-note','資料A〜Dは掲載順です。ヒント番号の順ではありません。'));
@@ -96,10 +97,12 @@
     const help=c.el('details','hints');help.append(c.el('summary','','試遊補助：未確定の採点条件を見る'));help.append(c.el('p','',`この版では最終扉を ${D.secondDoor}（赤）として通過できます。これは確定解法の代用ではありません。迷路原図の最終解答が確定したらdata/extra.jsのsecondDoorを差し替えます。`));target.append(help);
   }
   function documents(page,target,c){
-    target.append(c.el('p','','扉の奥で見つけたのは、書きかけの計画書と、日付のない日記だった。'));
+    HERO_STORY.ex.documentsIntro.forEach(t=>target.append(c.el('p','',t)));
     const grid=c.el('div','extra-paper-grid');const plan=c.el('article','extra-paper');plan.append(c.el('h3','','ヒーロー消滅計画'));const list=c.el('ul');D.plan.forEach(item=>{const li=c.el('li');li.append(c.el(item.done?'s':'span','',item.text));list.append(li);});plan.append(list,c.el('small','','取り消し線：実行済み'));
     const diary=c.el('article','extra-paper');diary.append(c.el('h3','','日付のない日記'));D.diary.forEach(t=>diary.append(c.el('p','',t)));grid.append(plan,diary);target.append(grid);
+    HERO_STORY.ex.documentsAfter.concat(HERO_STORY.ex.diaryAfter).forEach(t=>target.append(c.el('p','',t)));
     const rec=c.el('section','extra-transcript');rec.append(c.el('h3','','制御室・音声記録'),c.el('small','','REC-UNKNOWN / 一部破損 / 文字起こし・仮稿'),c.el('p','',D.recording.join('\n')));target.append(rec,c.el('p','extra-footer-note','この記録は制御室の端末に残ったローカル録音です。HERO LINKで受信した音声ではありません。'));
+    HERO_STORY.ex.recordAfter.forEach(t=>target.append(c.el('p','',t)));
     const fb=feedback(c);target.append(button(c,'資料を確認し、調査を始める →',()=>{c.complete(page.id,['read']);fb.textContent='資料を保存しました。次へ進めます。';fb.classList.add('is-ok');}),fb);if(completed(c,page)){fb.textContent='資料は確認済みです。次へ進めます。';fb.classList.add('is-ok');}
   }
   function directivePanel(c,p){
@@ -144,37 +147,31 @@
     if(completed(c,page)){confirm.disabled=true;fb.textContent='現在の生体信号を確認済みです。正確な位置はまだ取得できていません。';fb.classList.add('is-ok');}
   }
   function repair(page,target,c){
-    const s=state(c);target.append(c.el('p','extra-lead','HERO LINKは「助けて」の宛先を必須にしていた。誰に頼ればいいかわからない声は、どこへ行く？'));
-    const log=c.el('section','extra-terminal');log.append(c.el('h3','','未処理の救援要請 / 試作用の診断ログ'),c.el('output','','送信元：EQ-01（エコー）\n本文：誰か……みんなを助けて\n宛先：未指定\n旧設定：宛先未指定 → 破棄\nエラー：DESTINATION_REQUIRED\n位置返信：受付未成立のため未要求'));target.append(log);
+    const s=state(c);(page.paragraphs||[]).forEach(t=>target.append(c.el('p','',t)));
+    const log=c.el('section','extra-terminal');log.append(c.el('h3','','SOS分類の診断ログ / 操作試作'),c.el('output','','送信元：EQ-01（エコー）\n発信者区分：ヒーロー\n信号：非常用SOS\n現在の分類先：装備異常の記録\n救援受付：未受理\n通常の隊員通信：動作中'));target.append(log);
     const f=formBase(c,target,page.id);const fields=c.el('div','extra-settings');
-    const policy=field(c,f,'policy','宛先が空白のSOSを受信したら',[{value:'drop',label:'従来どおり破棄する'},{value:'queue',label:'保留キューに保存し、受付へ回す'},{value:'ignore',label:'エラー表示だけ消す'}]);
-    const dest=field(c,f,'dest','宛先未指定の場合の受付先',[{value:'echo',label:'エコー個人の受信箱'},{value:'rescue',label:'救援受付（受信可能な窓口）'},{value:'none',label:'未指定のままにする'}]);
+    const policy=field(c,f,'policy','非常用SOSを救援として扱う発信者',[{value:'citizen',label:'市民だけを対象にする'},{value:'all',label:'市民・ヒーローの両方を対象にする'},{value:'hero',label:'ヒーローだけを対象にする'}]);
+    const dest=field(c,f,'dest','ヒーローの非常用SOSの分類先',[{value:'equipment',label:'装備異常の記録だけに残す'},{value:'rescue',label:'救援受付で受理し、担当者へ通知する'},{value:'none',label:'記録を削除する'}]);
     const reply=field(c,f,'reply','救援受付後の位置照会をどうする？',[{value:'request',label:'元の送信装備へ返信し、位置情報を要求する'},{value:'guess',label:'最後の中継器から現在地を推定して確定する'},{value:'off',label:'位置照会を行わない'}]);fields.append(policy.box,dest.box,reply.box);f.append(fields);const apply=submitButton(c,f,'修正案を検証して適用する');const fb=feedback(c);f.append(fb);
     const result=c.el('section');target.append(result);
-    f.addEventListener('submit',e=>{e.preventDefault();if(s.patchApplied)return;if(policy.input.value!=='queue'||dest.input.value!=='rescue'||reply.input.value!=='request'){fb.textContent='救援要請を保持し、受付が受け取り、送信元へ返信できる経路にしてください。表示だけを直しても、声は届きません。';return;}s.patchApplied=true;c.persist();showState();});
-    function showState(){result.replaceChildren();if(!s.patchApplied)return;f.querySelectorAll('input,select,button').forEach(x=>x.disabled=true);apply.textContent='修正を適用済み ✓';fb.textContent='宛先未指定のSOSが保留キューに戻り、救援受付で受理されました。';fb.classList.add('is-ok');
-      const box=c.el('div','extra-receipt');box.append(c.el('h3','','救援受付 / 受理済み'),c.el('p','','EQ-01 → 保留キュー → 救援受付 → EQ-01へ返信可能'));
-      if(!s.location){const request=button(c,'送信元装備へ正式な位置情報を要求する',()=>{request.disabled=true;status.textContent='受付完了 → 位置照会を返信 → 応答を照合中…';const timer=setTimeout(()=>{if(!box.isConnected)return;s.location={...D.rescueLocation,receivedAt:'20:45:12',source:'EQ-01 / 返信された設備位置ID'};c.persist();showState();},700);timers.push(timer);});const status=c.el('p','extra-footer-note','近距離点検信号ではなく、救援通信への返信経路を使います。');box.append(request,status);}
+    f.addEventListener('submit',e=>{e.preventDefault();if(s.patchApplied)return;if(!c.save.completedPuzzleIds.includes('x-last-reason')){fb.textContent='先に、前のページで過去と現在の記録を比較してください。';return;}if(policy.input.value!=='all'||dest.input.value!=='rescue'||reply.input.value!=='request'){fb.textContent='助ける側も、助けを必要とします。ヒーローの非常用SOSが救援として受理される扱いにしてください。';return;}s.patchApplied=true;s.repairVersion=2;c.persist();showState();});
+    function showState(){result.replaceChildren();if(!s.patchApplied)return;f.querySelectorAll('input,select,button').forEach(x=>x.disabled=true);apply.textContent='修正を適用済み ✓';fb.textContent='ヒーローの非常用SOSが救援受付に現れ、受理番号が発行されました。';fb.classList.add('is-ok');
+      const box=c.el('div','extra-receipt');box.append(c.el('h3','','救援受付 / 受理済み'),c.el('p','','EQ-01：非常用SOS → 救援受付 → 受理番号発行 → 担当者へ通知'));
+      HERO_STORY.ex.receiptReady.forEach(t=>box.append(c.el('p','',t)));
+      if(!s.location){const request=button(c,'送信元装備へ正式な位置情報を要求する',()=>{request.disabled=true;HERO_STORY.ex.receiptRequest.forEach(t=>box.append(c.el('p','',t)));status.textContent='受付完了 → 位置照会を返信 → 応答を照合中…';const timer=setTimeout(()=>{if(!box.isConnected)return;s.location={...D.rescueLocation,receivedAt:'20:45:12',source:'EQ-01 / 返信された設備位置ID'};c.persist();showState();},700);timers.push(timer);});const status=c.el('p','extra-footer-note','近距離点検信号ではなく、救援通信への返信経路を使います。');box.append(request,status);}
       else {box.append(c.el('p','location-code',s.location.code),c.el('p','',s.location.name),c.el('p','','到達経路：'+s.location.route),c.el('p','extra-footer-note','取得元：'+s.location.source+' / ゲーム内受信時刻 '+s.location.receivedAt));
         if(!s.dispatched)box.append(button(c,'位置情報と救出経路を救助班へ送る',()=>{s.dispatched=true;c.complete(page.id,[s.location.code,'rescue-dispatched']);showState();}));
         else box.append(c.el('p','','✓ 救助班が位置情報を受領しました。次へ進めます。'));
-      }result.append(box);
+      }
+      const narrative=s.dispatched?HERO_STORY.ex.receiptLocation.concat(HERO_STORY.ex.receiptDispatch):s.location?HERO_STORY.ex.receiptLocation:HERO_STORY.ex.receiptRequest;
+      if(s.location)narrative.forEach(t=>box.append(c.el('p','',t)));
+      result.append(box);
     }showState();
-    hints(c,target,['日記の送り主もエコーも「誰か」に助けを求めています。個人名を知っていないとSOSを出せない仕組みを変えましょう。','宛先がない通信も保持し、救援受付へ届けます。受付後に初めて、元の装備へ位置情報を問い合わせます。']);
+    hints(c,target,['通信そのものは動いています。市民とヒーローでSOSの分類先が異なることが問題です。','ヒーローのSOSも救援受付で受理し、担当者へ通知します。そのあとで正式な位置照会を行います。']);
   }
   function render(page,target,c){
-    const scenes={unlock,first,firstDoor,maze,documents,investigation,survival,repair};
+    const scenes={unlock,first,firstDoor,maze,documents,investigation,survival,repair,reason:(p,t,c)=>HERO_UI.reason(p,t,c)};
     scenes[page.scene](page,target,c);
   }
-  function renderLink(target,c,page){
-    const s=state(c);target.append(c.el('p','extra-link-status','EXTRA / '+page.label));
-    const ready=c.save.completedPuzzleIds.includes('x-documents');
-    const items=[{id:'mission',label:'受信した指令',render:p=>{p.append(c.el('h3','','ヒーローが消えた夜'),c.el('p','','現在の任務：'+page.title));p.append(c.el('p','extra-footer-note','HERO LINKを閉じると、問題画面と入力内容に戻ります。'));}}];
-    if(ready){items.push({id:'evidence',label:'記録調査',render:p=>{note(c,p,'追加した調査資料・時刻復元値は試作用です。');investigation({id:'x-third'},p,c,true);}});items.push({id:'equipment',label:'装備受信',render:p=>{p.append(c.el('h3','','近距離通信拡張'));p.append(c.el('p','',s.extensionInstalled?'受信拡張：導入済み':'受信拡張：未導入。Third Missionで制御室の端末を調べてください。'));if(s.extensionInstalled){table(c,p,['ヒーロー','信号'],D.heartbeats.map(h=>[h.hero,s.bioConfirmed?'更新中・生存確認済み':'未確認']),'装備点検受信状態');p.append(c.el('p','','位置情報：近距離点検信号には含まれません。'));}}});}
-    if(s.bioConfirmed)items.push({id:'rescue',label:'救援通信',render:p=>{p.append(c.el('h3','','宛先未指定のSOS'));p.append(c.el('p','',s.patchApplied?'修正済み：保留キュー → 救援受付':'送信失敗：DESTINATION_REQUIRED'));p.append(c.el('p','',s.location?s.location.name:'正式な位置情報は未取得'));if(s.dispatched)p.append(c.el('p','','救助班へ送信済み。'));}});
-    items.push({id:'activity',label:'活動記録',render:p=>{p.append(c.el('h3','','活動記録'));['easy','normal','hard','extra'].forEach(id=>{const r=c.loadSave(id);p.append(c.el('p','',id.toUpperCase()+'：'+(r.cleared?'CLEAR':r.started?'挑戦中':'未挑戦')));});p.append(c.el('p','prototype-note','隊員同士の実通信・掲示板連携は未接続です。'));}});
-    tabs(c,target,items,'linkTab');
-    if(!ready)target.append(c.el('p','extra-link-locked','記録調査と装備受信は、制御室の資料を発見した後に追加されます。'));
-  }
-  window.HERO_EXTRA_UI={render,renderLink,cleanup};
+  window.HERO_EXTRA_UI={render,cleanup,renderEvidence:(target,c)=>investigation({id:'x-third'},target,c,true)};
 })();

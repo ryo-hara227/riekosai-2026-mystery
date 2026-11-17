@@ -1,13 +1,15 @@
 (() => {
   'use strict';
-  const COURSES = { easy: window.HERO_EASY, normal: window.HERO_NORMAL, hard: window.HERO_HARD, extra: window.HERO_EXTRA };
+  const COURSES = { prologue:window.HERO_PROLOGUE, easy: window.HERO_EASY, normal: window.HERO_NORMAL, hard: window.HERO_HARD, extra: window.HERO_EXTRA };
   if (Object.values(COURSES).some(c => !c || !Array.isArray(c.pages))) {
     document.body.textContent = '問題データを読み込めませんでした。dataフォルダとスクリプトを確認してください。';
     return;
   }
   // EASYの保存キーは旧試作と共通のまま維持しています。
-  const STORAGE_KEYS = { easy: 'hero_easy_progress_v1', normal: 'hero_normal_progress_v1', hard: 'hero_hard_progress_v1', extra:'hero_extra_progress_v1' };
-  const gated = p => ['puzzle','map','hardcode','extra'].includes(p.type);
+  const STORAGE_KEYS = { prologue:'hero_prologue_progress_v1', easy: 'hero_easy_progress_v1', normal: 'hero_normal_progress_v1', hard: 'hero_hard_progress_v1', extra:'hero_extra_progress_v1' };
+  const gated = p => ['puzzle','flow','hardcode','extra','tutorial','contact'].includes(p.type);
+  const memorySaves={};
+  let pendingCourse=null;
   const get = id => document.getElementById(id);
   const el = (tag, className, content) => {
     const node = document.createElement(tag);
@@ -26,19 +28,22 @@
   let save = null;
   const course = () => COURSES[courseId];
   const pages = () => course().pages;
-  const defaultSave = id => ({ version:1, started:false, currentPageId:COURSES[id].pages[0].id, completedPuzzleIds:[], answerEntries:{}, cleared:false });
+  const defaultSave = id => ({ version:4, started:false, currentPageId:COURSES[id].pages[0].id, completedPuzzleIds:[], answerEntries:{}, notifications:[],journal:[],cleared:false });
   function loadSave(id) {
     try {
-      const raw = JSON.parse(localStorage.getItem(STORAGE_KEYS[id]));
+      const raw = JSON.parse(localStorage.getItem(STORAGE_KEYS[id])||'null')||memorySaves[id];
       if (!raw || typeof raw !== 'object') return defaultSave(id);
-      return { ...defaultSave(id), ...raw,
+      const record={ ...defaultSave(id), ...raw,
         completedPuzzleIds: Array.isArray(raw.completedPuzzleIds) ? raw.completedPuzzleIds : [],
+        notifications:Array.isArray(raw.notifications)?raw.notifications:[],journal:Array.isArray(raw.journal)?raw.journal:[],
         answerEntries: raw.answerEntries && typeof raw.answerEntries === 'object' && !Array.isArray(raw.answerEntries) ? raw.answerEntries : {}
       };
-    } catch { return defaultSave(id); }
+      if(id==='extra'&&raw.version!==4){record.completedPuzzleIds=record.completedPuzzleIds.filter(x=>!['x-last','x-last-reason'].includes(x));record.extra={...(record.extra||{}),patchApplied:false,location:null,dispatched:false,repairVersion:2};if(raw.cleared||['x-last','x-rescue','x-clear'].includes(raw.currentPageId)){record.currentPageId='x-confront';record.cleared=false;}record.updatedLast=true;}record.version=4;return record;
+    } catch { return memorySaves[id]||defaultSave(id); }
   }
   save = loadSave('easy');
-  function persist() { try { localStorage.setItem(STORAGE_KEYS[courseId], JSON.stringify(save)); } catch { /* 保存が許可されないブラウザでもプレイ可能 */ } }
+  function persist() { memorySaves[courseId]=save;try { localStorage.setItem(STORAGE_KEYS[courseId], JSON.stringify(save)); } catch {} updateUnread(); }
+  function updateUnread(){const count=Object.keys(COURSES).reduce((sum,id)=>sum+(id===courseId?save:loadSave(id)).notifications.filter(n=>!n.read).length,0);const badge=get('unreadBadge');badge.hidden=!count;badge.textContent=count;get('heroLinkBtn').setAttribute('aria-label','HERO LINKを開く'+(count?' 未読'+count+'件':''));}
   function indexForId(id) { const i = pages().findIndex(p => p.id === id); return i >= 0 ? i : 0; }
   function goTop() { try { window.scrollTo({ top:0, behavior:'instant' }); } catch {} }
   function navigateHome() {
@@ -53,6 +58,10 @@
     save.started = true;
     save.currentPageId = pages()[currentIndex].id;
     if (pages()[currentIndex].type === 'clear') save.cleared = true;
+    const page=pages()[currentIndex];
+    if(page.notification&&!save.notifications.some(n=>n.id===page.id))save.notifications.push({id:page.id,title:page.notification.message,body:page.notification.body||page.notification.message,read:false});
+    if(page.image&&page.type!=='flow'&&!save.journal.some(a=>a.src===page.image))save.journal.push({src:page.image,title:page.imageLabel||page.title});
+    if(page.id==='p-03'&&!save.notifications.some(n=>n.id==='p-welcome'))save.notifications.push({id:'p-welcome',title:'マネージャーより：ようこそ、響ヶ丘学園祭へ',body:'通知はこの一覧に残ります。連絡先を確認しました。',read:false});
     persist();
     homeScreen.hidden = true;
     playScreen.hidden = false;
@@ -71,12 +80,15 @@
     renderHomeCourse('normal','normalHomeProgress','normalResumeBtn');
     renderHomeCourse('hard','hardHomeProgress','hardResumeBtn');
     renderHomeCourse('extra','extraHomeProgress','extraResumeBtn');
+    get('prologueHomeProgress').textContent=loadSave('prologue').cleared?'プロローグ読了 ✓':'はじめての方は、ここから';updateUnread();
   }
   function enterCourse(id, restart) {
+    if(id!=='prologue'&&!loadSave('prologue').cleared){pendingCourse={id,restart};enterCourse('prologue',false);return;}
+    const record=loadSave(id);
+    if(restart&&record.started&&!window.confirm(`${id.toUpperCase()}を最初から遊び直しますか？ このコースの解答済み記録もリセットされます。`))return;
     courseId = id;
-    save = loadSave(id);
+    save = record;
     if (restart) {
-      if (save.started && !window.confirm(`${id.toUpperCase()}を最初から遊び直しますか？ このコースの解答済み記録もリセットされます。`)) return;
       save = defaultSave(id);
       persist(); navigatePage(0);
     } else navigatePage(indexForId(save.currentPageId));
@@ -101,18 +113,19 @@
     const frag = document.createDocumentFragment();
     const frame = el('div','puzzle-image-frame');
     const img = el('img');
-    img.src = `./${src}`;
+    img.src = `./${src}?v=4`;
     img.alt = `${label}の画像`;
     img.loading = 'eager';
     img.addEventListener('error',()=>{ frame.textContent = `画像が見つかりません：${src}`; });
     frame.appendChild(img); frag.appendChild(frame);
+    if(src.endsWith('.svg')){frame.classList.add('vector-scroll');img.style.width='1200px';img.style.maxWidth='none';const fit=el('button','btn btn--outline','地図を全体表示／原寸表示');fit.type='button';fit.addEventListener('click',()=>{const full=img.style.width==='100%';img.style.width=full?'1200px':'100%';});frag.append(fit,el('p','asset-note','地図は左右・上下に動かせます。原寸表示では文字を大きく読めます。'));}
     const zoom = el('button','image-zoom-btn','⤢ 画像を拡大して見る');
     zoom.type = 'button';
     zoom.addEventListener('click',()=>openImage(src,label));
     frag.appendChild(zoom); return frag;
   }
   function openImage(src,label) {
-    get('enlargedImage').src = `./${src}`;
+    get('enlargedImage').src = `./${src}?v=4`;
     get('enlargedImage').alt = `${label}・拡大表示`;
     if (typeof imageDialog.showModal === 'function') imageDialog.showModal();
     else window.open(`./${src}`,'_blank','noopener');
@@ -122,13 +135,7 @@
     appendParagraphs(copy,page.paragraphs);
     if (page.image) copy.appendChild(makeImage(page.image,page.imageLabel||page.title));
     if (page.note) copy.append(el('p','asset-note',page.note));
-    if (page.notification) {
-      const alert = el('div','system-notification');
-      alert.append(el('div','system-notification__system',page.notification.system));
-      alert.append(el('div','system-notification__text',page.notification.message));
-      alert.append(el('div','notification-label','HERO LINK SYSTEM / NOTIFICATION'));
-      copy.appendChild(alert);
-    }
+    if (page.notification) copy.append(window.HERO_UI.button(extraContext(),'HERO LINKの通知を確認する',()=>showHeroLink('notifications')));
     appendParagraphs(copy,page.afterAlert);
     target.appendChild(copy);
   }
@@ -171,6 +178,7 @@
     submit.type='submit'; submit.disabled=solved;
     buttons.appendChild(submit);
     const feedback=el('p','answer-feedback'+(solved?' is-ok':''),solved?'正解！「次へ」から物語を進めてください。':'');
+    inputs.forEach(input=>input.addEventListener('input',()=>{if(solved)return;save.answerEntries[page.id]=page.choices?[inputs.find(x=>x.checked)?.value||'']:inputs.map(x=>x.value);persist();}));
     feedback.setAttribute('role','status'); feedback.setAttribute('aria-live','polite');
     form.append(buttons,feedback);
     form.addEventListener('submit',ev=>{
@@ -196,65 +204,8 @@
       target.appendChild(hints);
     }
   }
-  // HARD専用：マップは一枚絵で、途中の小謎を個別採点しません。
-  // 解いた結果の「目的地」を最後に一度だけ選びます。
-  function renderHardMap(page,target) {
-    target.append(el('p','puzzle-instruction',page.prompt));
-    const controls = el('div','hard-map-controls');
-    const small = el('button','btn btn--outline','－ 縮小'); small.type='button';
-    const large = el('button','btn btn--outline','＋ 拡大'); large.type='button';
-    const reset = el('button','btn btn--subtle','標準倍率'); reset.type='button';
-    controls.append(small,large,reset);
-    target.appendChild(controls);
-    const viewport=el('div','hard-map-viewport');
-    viewport.tabIndex=0;viewport.setAttribute('aria-label','H-01 探索マップ。上下左右にスクロールして各問題を確認してください');
-    const img=el('img','hard-map-img');img.src='./'+page.image;img.alt='H1-01〜H1-08の全問題をつないだ探索マップ';img.loading='eager';
-    viewport.appendChild(img);target.appendChild(viewport);
-    let pixels=1420;
-    function setMapWidth(px,center=false) {
-      const oldW=viewport.scrollWidth||1, oldH=viewport.scrollHeight||1;
-      const midX=(viewport.scrollLeft+viewport.clientWidth/2)/oldW;
-      const midY=(viewport.scrollTop+viewport.clientHeight/2)/oldH;
-      pixels=Math.min(3100,Math.max(750,px));img.style.width=pixels+'px';
-      requestAnimationFrame(()=>{
-        if (center) {viewport.scrollLeft=Math.max(0,(viewport.scrollWidth-viewport.clientWidth)/2);viewport.scrollTop=0;}
-        else {viewport.scrollLeft=midX*viewport.scrollWidth-viewport.clientWidth/2;viewport.scrollTop=midY*viewport.scrollHeight-viewport.clientHeight/2;}
-      });
-    }
-    img.addEventListener('load',()=>setMapWidth(pixels,true),{once:true});
-    small.addEventListener('click',()=>setMapWidth(Math.round(pixels/1.28)));
-    large.addEventListener('click',()=>setMapWidth(Math.round(pixels*1.28)));
-    reset.addEventListener('click',()=>setMapWidth(1420,true));
-    target.append(el('p','asset-note','左右・上下にスクロールして読めます。拡大ボタンは画像の中心付近を維持します。解いた経路は端末内に記録しません。'));
-    const form=el('form','answer-form');form.noValidate=true;
-    const fieldset=el('fieldset','answer-choice-group');
-    fieldset.append(el('legend','','最後に着いた建物を選んでください'));
-    const opts=[['gym','体育館'],['old','旧校舎'],['lab','研究棟'],['storage','資材倉庫'],['hall','放送室'],['library','図書室'],['dining','食堂'],['admin','管理棟'],['greenhouse','温室']];
-    const selectedPreviously=(save.answerEntries[page.id]||[])[0];
-    const solved=save.completedPuzzleIds.includes(page.id);
-    const inputs=[];
-    for (const [key,labelText] of opts) {
-      const label=el('label','choice-item');const radio=el('input');radio.type='radio';radio.name='hard-place-'+page.id;radio.value=key;
-      radio.checked=key===selectedPreviously;radio.disabled=solved;
-      label.append(radio,el('span','choice-name',labelText));fieldset.append(label);inputs.push(radio);
-    }
-    form.appendChild(fieldset);
-    const submit=el('button','btn btn--red',solved?'報告済み ✓':'この場所を報告する →');submit.type='submit';submit.disabled=solved;
-    const feedback=el('p','answer-feedback',solved?'場所を報告しました。次へ進んでください。':'');feedback.setAttribute('role','status');
-    form.append(submit,feedback);
-    form.addEventListener('submit',ev=>{
-      ev.preventDefault(); if(save.completedPuzzleIds.includes(page.id))return;
-      const choice=inputs.find(i=>i.checked)?.value;
-      if(!choice){feedback.textContent='場所をひとつ選択してください。';return;}
-      if((page.stage==='second' && choice!=='old') || (page.stage==='first' && choice!=='gym' && choice!=='old')){
-        feedback.textContent='この場所では子どもたちを確認できませんでした。マップの分岐をもう一度確かめてください。';return;
-      }
-      save.completedPuzzleIds.push(page.id);save.answerEntries[page.id]=[choice];persist();
-      navigatePage(currentIndex+1);
-    });
-    target.appendChild(form);
-    renderHints(page,target);
-  }
+  // HARD：小問を2択で切り替え、到着した目的地を最後に報告します。
+  function renderHardMap(page,target) { window.HERO_UI.flow(page,target,extraContext()); }
   function renderHints(page,target){
     if(!page.hints?.length)return;
     const hints=el('div','hints');
@@ -306,14 +257,8 @@
     const fallback=el('div','award-placeholder__fallback',`${courseId.toUpperCase()} BADGE
 デザイン画像を差し替え予定`);
     award.append(picture,fallback);wrap.append(award);
-    if(courseId!=='extra') {
-    wrap.append(el('p','','最後のミッションで使う合言葉をひとつ贈ります。'));
-    const keyword=el('div','keyword-box');
-    keyword.append(el('div','keyword-box__caption',`EXTRA解禁用の合言葉${({easy:'A',normal:'B',hard:'C'})[courseId]}`));
-    keyword.append(el('div','keyword-box__word',course().extraKeyword));
-    keyword.append(el('div','keyword-box__caution','※ 現在は仮の合言葉です。正式なEXTRA実装時に変更する予定です。'));
-    wrap.append(keyword,el('p','','EASY・NORMAL・HARDの3つの合言葉を集めると、EXTRAへ挑戦できます。'));
-    } else wrap.append(el('p','prototype-note','EXTRA試作版はここまでです。扉コードの対応・調査資料・最終修正ギミックは今後調整する仮実装です。'));
+    if(courseId!=='extra') {const all=['easy','normal','hard'].every(id=>id===courseId?save.cleared:loadSave(id).cleared);wrap.append(el('p','',all?'3つのミッションをクリアしました。EXTRAが解放されました！':'EASY・NORMAL・HARDをすべてクリアすると、EXTRAが解放されます。'));}
+    else wrap.append(el('p','prototype-note','調整中の謎は、ページ内で仮実装と示しています。物語は現実への帰還まで収録しています。'));
     const actions=el('div','clear-view__actions');
     const home=el('button','btn btn--red','ミッション一覧へ →');home.type='button';home.addEventListener('click',navigateHome);
     actions.append(home);wrap.appendChild(actions);target.appendChild(wrap);
@@ -322,8 +267,8 @@
     window.HERO_EXTRA_UI.cleanup();
     const page=pages()[currentIndex];
     document.body.classList.toggle('is-extra',courseId==='extra');
-    get('courseBadge').textContent=courseId==='extra'?'EXTRA / PROTOTYPE':`${courseId.toUpperCase()} / 15 MIN`;
-    get('courseMini').textContent=`HERO MISSION ${({easy:'01',normal:'02',hard:'03',extra:'04 / AFTER DARK'})[courseId]}`;
+    get('courseBadge').textContent=courseId==='prologue'?'PROLOGUE / TUTORIAL':courseId==='extra'?'EXTRA / PROTOTYPE':`${courseId.toUpperCase()} / 15 MIN`;
+    get('courseMini').textContent=`HERO MISSION ${({prologue:'00',easy:'01',normal:'02',hard:'03',extra:'04 / AFTER DARK'})[courseId]}`;
     get('playTitle').textContent=course().title;
     get('logBtn').hidden=courseId!=='normal';
     get('stepLabel').textContent=`${page.label} / ${currentIndex+1}・全${pages().length}ページ`;
@@ -335,11 +280,14 @@
     pagePanel.append(el('h2','page-title',page.title));
     if(page.prototype) pagePanel.append(el('p','prototype-note','仮実装：'+page.prototype));
     if (page.type==='story') renderStory(page,pagePanel);
-    if (page.type==='puzzle') renderPuzzle(page,pagePanel);
-    if (page.type==='map') renderHardMap(page,pagePanel);
+    if (page.type==='puzzle') {if(page.id==='n-last')window.HERO_UI.normalMission(page,pagePanel,extraContext());else renderPuzzle(page,pagePanel);}
+    if (page.type==='flow') renderHardMap(page,pagePanel);
     if (page.type==='hardcode') renderHardCode(page,pagePanel);
     if (page.type==='clear') renderClear(pagePanel);
     if (page.type==='extra') window.HERO_EXTRA_UI.render(page,pagePanel,extraContext());
+    if(page.type==='tutorial')window.HERO_UI.tutorial(page,pagePanel,extraContext());
+    if(page.type==='contact')window.HERO_UI.contact(page,pagePanel,extraContext());
+    if(page.type==='introDone')window.HERO_UI.introDone(pagePanel,extraContext());
     prevBtn.disabled=currentIndex===0;
     const allowed=!gated(page)||save.completedPuzzleIds.includes(page.id);
     nextBtn.disabled=!allowed||currentIndex===pages().length-1;
@@ -353,55 +301,41 @@
   get('hardResumeBtn').addEventListener('click',()=>enterCourse('hard',false));
   get('extraStartBtn').addEventListener('click',()=>enterCourse('extra',true));
   get('extraResumeBtn').addEventListener('click',()=>enterCourse('extra',false));
+  get('prologueStartBtn').addEventListener('click',()=>enterCourse('prologue',false));
   get('homeBtn').addEventListener('click',navigateHome);
   get('logBtn').addEventListener('click',()=>openImage('assets/normal/n-last.png','緊急通信ログ'));
   prevBtn.addEventListener('click',()=>{ if(courseId==='hard'&&pages()[currentIndex].id==='h-rescue'&&(save.answerEntries['h-map-first']||[])[0]==='old'&&(save.answerEntries['h-code-first']||[])[0]==='1129') navigatePage(indexForId('h-code-first')); else navigatePage(currentIndex-1); });
   nextBtn.addEventListener('click',()=>{ if (!nextBtn.disabled&&currentIndex<pages().length-1) navigatePage(courseId==='hard'?nextHardIndex(pages()[currentIndex]):currentIndex+1); });
   get('resetBtn').addEventListener('click',()=>{
     if (!window.confirm('この端末のEASY・NORMAL・HARD・EXTRAすべてのテスト進捗を消去しますか？')) return;
-    Object.values(STORAGE_KEYS).forEach(key=>{ try { localStorage.removeItem(key); } catch {} });
+    Object.values(STORAGE_KEYS).forEach(key=>{ try { localStorage.removeItem(key); } catch {} });Object.keys(memorySaves).forEach(k=>delete memorySaves[k]);
     save=defaultSave(courseId); navigateHome();
   });
-  // HERO LINKの共通UI試作。隊員チャット用のバックエンドは未接続です。
+  // 作中人物との連絡と、実際の参加者向け掲示板を共通の入口にまとめます。
   const linkDialog=get('heroLinkDialog');
   function extraContext() {
-    return {el,save,persist,makeImage,normalizeText,goodAnswer,loadSave,
+    return {el,save,persist,makeImage,normalizeText,goodAnswer,loadSave,courseId,courses:COURSES,page:pages()[currentIndex],index:currentIndex,renderPuzzle,renderHints,
       complete(id,entries=[]) {
         if(!save.completedPuzzleIds.includes(id)) save.completedPuzzleIds.push(id);
         save.answerEntries[id]=entries;persist();
         if(pages()[currentIndex].id===id) { nextBtn.disabled=false;nextBtn.textContent='完了！ 次へ →'; }
       },
-      openLink:showHeroLink,
+      openLink:showHeroLink,openImage,navigatePage,navigateHome,
+      finishIntro(){save.cleared=true;persist();const next=pendingCourse;pendingCourse=null;if(next)enterCourse(next.id,next.restart);else navigateHome();},
+      writeSave(id,record){memorySaves[id]=record;try{localStorage.setItem(STORAGE_KEYS[id],JSON.stringify(record));}catch{}if(id===courseId)save=record;updateUnread();},
       refresh:renderPage
     };
   }
-  function showHeroLink(){
+  function showHeroLink(tab) {
     const contents=get('heroLinkContents');contents.replaceChildren();
-    const active=playScreen.hidden?null:COURSES[courseId];
-    linkDialog.classList.toggle('hero-link-dialog--extra',Boolean(active&&courseId==='extra'));
-    if(active&&courseId==='extra') {
-      window.HERO_EXTRA_UI.renderLink(contents,extraContext(),pages()[currentIndex]);
-      if(!linkDialog.open) linkDialog.showModal();
-      return;
-    }
-    const mission=el('section','hero-link-section');
-    mission.append(el('h3','','受信した指令'));
-    mission.append(el('p','',active?`${courseId.toUpperCase()}：${active.title}`:'ミッションを選択すると、ここに指令が届きます。'));
-    if(active) mission.append(el('p','','現在の任務：'+(pages()[currentIndex].label||'')));
-    contents.append(mission);
-    const help=el('section','hero-link-section');
-    help.append(el('h3','','隊員通信'));
-    help.append(el('p','','この試作版では他の隊員との通信はまだ接続されていません。既存の掲示板機能を統合する予定です。'));
-    contents.append(help);
-    const record=el('section','hero-link-section');record.append(el('h3','','活動記録'));
-    ['easy','normal','hard','extra'].forEach(id=>{const s=loadSave(id);record.append(el('p','',`${id.toUpperCase()}：${s.cleared?'CLEAR':s.started?'挑戦中':'未挑戦'}`));});
-    contents.append(record);
-    if(typeof linkDialog.showModal==='function')linkDialog.showModal();
+    window.HERO_UI.link(contents,extraContext(),playScreen.hidden?null:pages()[currentIndex],typeof tab==='string'?tab:null);
+    linkDialog.classList.add('hero-link-dialog--v4');if(!linkDialog.open)linkDialog.showModal();
   }
   get('heroLinkBtn').addEventListener('click',showHeroLink);
   get('heroLinkClose').addEventListener('click',()=>linkDialog.close());
   linkDialog.addEventListener('click',ev=>{if(ev.target===linkDialog)linkDialog.close();});
   get('closeImageBtn').addEventListener('click',()=>imageDialog.close());
   imageDialog.addEventListener('click',e=>{ if(e.target===imageDialog) imageDialog.close(); });
+  window.HERO_UI.bind(extraContext);
   navigateHome();
 })();

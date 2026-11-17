@@ -43,7 +43,8 @@
  <text x="462" y="519" fill="white" font-size="17">ゲーム</text><text x="462" y="542" fill="white" font-size="17">コーナー2</text>
  <rect x="752" y="375" width="352" height="218" rx="17" fill="#53a637" stroke="#1a7541" stroke-width="6"/>
  <text x="928" y="461" fill="white" font-size="37">メイン</text><text x="928" y="506" fill="white" font-size="37">ステージ</text>
- <text x="928" y="548" fill="white" font-size="22">（青いリストバンド）</text>
+ <rect x="769" y="525" width="318" height="48" rx="8" fill="#fffdf1" stroke="#164e7d" stroke-width="2"/>
+ <text x="928" y="558" fill="#124e8a" font-size="28">青いリストバンド</text>
  <rect x="153" y="405" width="151" height="66" rx="10" fill="#f18535" stroke="#b55514" stroke-width="4"/>
  <text x="229" y="445" fill="white" font-size="22">屋台 1</text>
  <rect x="153" y="504" width="151" height="66" rx="10" fill="#f18535" stroke="#b55514" stroke-width="4"/>

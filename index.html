@@ -5,15 +5,21 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#ffe27b">
   <meta name="description" content="HEROES! EASY・NORMAL・HARDとEXTRA『ヒーローが消えた夜』の試作版。">
-  <title>HEROES! | ヒーロー謎解き企画</title>
-  <link rel="stylesheet" href="./styles.css?v=4-extra1">
-  <link rel="stylesheet" href="./extra.css?v=4-extra1">
+  <title>スーパーヒーローへの道 | ぱかの輪presents</title>
+  <link rel="stylesheet" href="./styles.css?v=4-final1">
+  <link rel="stylesheet" href="./extra.css?v=4-final1">
+  <link rel="stylesheet" href="./v4.css?v=4-final1">
   <script defer src="./data/easy.js?v=3"></script>
   <script defer src="./data/normal.js?v=3"></script>
   <script defer src="./data/hard.js?v=3"></script>
   <script defer src="./data/extra.js?v=4-extra1"></script>
-  <script defer src="./extra-ui.js?v=4-extra1"></script>
-  <script defer src="./app.js?v=4-extra1"></script>
+  <script defer src="./data/story.js?v=4-final1"></script>
+  <script defer src="./data/site.js?v=4-final1"></script>
+  <script defer src="./board-config.js?v=4-final1"></script>
+  <script defer src="./board.js?v=4-final1"></script>
+  <script defer src="./site-ui.js?v=4-final1"></script>
+  <script defer src="./extra-ui.js?v=4-final1"></script>
+  <script defer src="./app.js?v=4-final1"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">本文へ移動</a>
@@ -26,17 +32,24 @@
         <span class="wordmark__bolt" aria-hidden="true">★</span>
         <span>HERO<span class="wordmark__highlight">ES!</span></span>
       </a>
-      <span class="site-header__tag">HERO PUZZLE PROJECT <small>/ EXTRA PROTOTYPE 01</small></span>
+      <span class="site-header__tag">HERO PUZZLE PROJECT <small>/ VERSION 4</small></span>
     </header>
 
     <main id="main">
       <section id="homeScreen" class="screen" aria-labelledby="homeTitle">
         <div class="cover" aria-label="ヒーロー謎解き企画タイトル">
-          <div class="cover__kicker">RI-E-KO FEST INSPIRED / FAN MADE</div>
-          <div class="cover__headline"><span class="cover__first">誰かの</span><strong id="homeTitle">ヒーローに<br>なれるかも。</strong></div>
-          <p class="cover__description">今日はヒーローたちのお祭り。<br>なのに、なんだか事件の予感……？</p>
+          <div class="cover__kicker">ぱかの輪presents</div>
+          <div class="cover__headline"><strong id="homeTitle">スーパーヒーロー<br>への道</strong></div>
+          <p class="cover__description">ヒーローたちによる、「もうひとつの」学園祭。<br><strong>なのに、なんだか事件の予感……？</strong></p>
           <div class="cover__sticker" aria-hidden="true">MISSION<br>START!</div>
         </div>
+
+        <nav class="guide-buttons" aria-label="遊ぶ前に">
+          <button type="button" class="btn btn--outline" data-guide="synopsis">あらすじ</button>
+          <button type="button" class="btn btn--outline" data-guide="how">遊び方</button>
+          <button type="button" class="btn btn--outline" data-guide="caution">注意事項</button>
+        </nav>
+        <section class="intro-card"><div><h2>はじめに：もうひとつの学園祭</h2><p>りえ高祭へ向かう途中、あなたの端末に届いたのは……。HERO LINKの使い方も、ここから。</p></div><button type="button" id="prologueStartBtn" class="btn btn--night">プロローグを読む →</button><p id="prologueHomeProgress"></p></section>
 
         <section class="mission-select" aria-label="ミッション選択">
           <div class="section-heading"><span class="section-heading__rule"></span><h2>CHOOSE YOUR MISSION!</h2><span class="section-heading__rule"></span></div>
@@ -44,7 +57,7 @@
             <article class="mission-card mission-card--easy">
               <div class="mission-card__meta"><span class="mission-pill">01 / EASY</span><span class="mission-card__duration">約15分</span></div>
               <h3>ヒーロー、<br>出動できません！</h3>
-              <p>エコーの変身バッジがなくなった！ 新人助手として、ショーが始まる前に探し出そう。</p>
+              <p>エコーの変身バッジがなくなった！ 迷い込んだ学園祭で、最初のお手伝いを引き受けよう。</p>
               <div class="mission-card__progress" id="homeProgress">未挑戦</div>
               <div class="mission-card__actions">
                 <button type="button" id="startBtn" class="btn btn--red">最初から遊ぶ <span aria-hidden="true">→</span></button>
@@ -54,7 +67,7 @@
             <article class="mission-card mission-card--normal">
               <div class="mission-card__meta"><span class="mission-pill">02 / NORMAL</span><span class="mission-card__duration">約15分</span></div>
               <h3>緊急指令！<br>街を守れ！</h3>
-              <p>通信ログが読めない！ 新人オペレーターとして、最新のSOSを解読してヒーローへ届けよう。</p>
+              <p>通信ログが読めない！ 本部の臨時の協力者として、最新の通報をヒーローへ届けよう。</p>
               <div class="mission-card__progress" id="normalHomeProgress">未挑戦</div>
               <div class="mission-card__actions">
                 <button type="button" id="normalStartBtn" class="btn btn--blue">最初から遊ぶ <span aria-hidden="true">→</span></button>
@@ -83,12 +96,7 @@
             </article>
           </div>
         </section>
-        <p class="notice">※ テスト版です。EXTRAはE/N/Hの合言葉で解禁できます。試遊用の解禁操作も用意しています。未完成部分は「仮実装」と表示し、進捗はこのブラウザに保存します。</p>
-        <section class="home-guidance" aria-label="遊ぶ前に">
-          <details><summary>遊び方</summary><p>好きな難易度を選び、問題を解いて進みます。迷ったときはヒントを開けます。HARDは一枚の大きな探索マップを追って解く形式です。</p></details>
-          <details><summary>あらすじ</summary><p>2026年11月29日、響ヶ丘学園祭。ヒーローたちが活躍する街で、次々と事件が起きています。HERO LINKに届くミッションを解決しましょう。</p></details>
-          <details><summary>注意事項</summary><p>これは非公式の創作企画です。実際の会場・出演者・スタッフ等への問い合わせや干渉はしないでください。謎の答えや重要な展開のネタバレ投稿にもご配慮ください。</p></details>
-        </section>
+        <p class="notice">※ 調整中の版です。EASY・NORMAL・HARDをすべてクリアするとEXTRAが解放されます。未完成部分は「仮実装」と表示しています。進捗はこのブラウザに保存されます。</p>
       </section>
 
       <section id="playScreen" class="screen" aria-labelledby="playTitle" hidden>
@@ -119,16 +127,18 @@
     </footer>
   </div>
 
-  <button type="button" id="heroLinkBtn" class="hero-link-launch" aria-label="HERO LINKを開く" title="HERO LINKを開く">⌁ <span>HERO LINK</span></button>
+  <button type="button" id="heroLinkBtn" class="hero-link-launch" aria-label="HERO LINKを開く" title="HERO LINKを開く">⌁ <span>HERO LINK</span><span id="unreadBadge" class="unread-badge" hidden></span></button>
   <dialog id="heroLinkDialog" class="hero-link-dialog" aria-label="HERO LINK">
     <div class="hero-link-head"><strong>⌁ HERO LINK</strong><button type="button" id="heroLinkClose" class="btn btn--outline">閉じる ✕</button></div>
-    <p class="hero-link-status">● 接続中 / プレイヤー用端末</p>
+    <p class="hero-link-status">プレイヤー用端末 / 通知・資料・活動記録・掲示板</p>
     <div id="heroLinkContents"></div>
   </dialog>
 
   <dialog id="imageDialog" class="image-dialog" aria-label="問題画像の拡大表示">
     <div class="image-dialog__head"><span>画像を拡大表示</span><button type="button" id="closeImageBtn" class="btn btn--outline">閉じる ✕</button></div>
-    <img id="enlargedImage" src="" alt="">
+    <div class="image-dialog-controls"><button type="button" id="imageZoomOut" class="btn btn--outline">－ 縮小</button><button type="button" id="imageFit" class="btn btn--outline">全体</button><button type="button" id="imageZoomIn" class="btn btn--outline">＋ 拡大</button></div>
+    <div class="image-pan"><img id="enlargedImage" alt=""></div>
   </dialog>
+  <dialog id="guideDialog" class="guide-dialog" aria-labelledby="guideTitle"><div class="hero-link-head"><h2 id="guideTitle"></h2><button type="button" id="guideClose" class="btn btn--outline">閉じる ✕</button></div><div id="guideContents"></div></dialog>
 </body>
 </html>
