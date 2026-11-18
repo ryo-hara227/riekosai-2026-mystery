@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 1125" role="img" aria-labelledby="title desc"><title id="title">通信ログ</title><desc id="desc">地区コードと、表示エラーが残る時刻、通報内容を照合する資料。</desc><rect width="2000" height="1125" fill="white"/><text x="1000" y="100" text-anchor="middle" font-size="78" font-weight="900" font-family="sans-serif">通信ログ</text><rect x="88" y="124" width="1824" height="164" fill="#e8eceb"/>
+<path d="M88 124V1038" stroke="#222" stroke-width="2"/>
+<path d="M544 124V1038" stroke="#222" stroke-width="2"/>
+<path d="M1000 124V1038" stroke="#222" stroke-width="2"/>
+<path d="M1912 124V1038" stroke="#222" stroke-width="2"/>
+<path d="M88 124H1912" stroke="#222" stroke-width="2"/>
+<path d="M88 288H1912" stroke="#222" stroke-width="2"/>
+<path d="M88 483H1912" stroke="#222" stroke-width="2"/>
+<path d="M88 647H1912" stroke="#222" stroke-width="2"/>
+<path d="M88 842H1912" stroke="#222" stroke-width="2"/>
+<path d="M88 1038H1912" stroke="#222" stroke-width="2"/>
+<text x="316" y="222" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="64">該当地区</text>
+<text x="772" y="222" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="64">時刻</text>
+<text x="1456" y="222" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="64">通信内容</text>
+<text x="316" y="410.5" text-anchor="middle" font-family="sans-serif" font-size="74">C-04</text>
+<g transform="translate(602,344.5)" fill="#333">
+<polygon points="8,0 40,0 45,5 40,10 8,10 3,5"/>
+<polygon points="8,72 40,72 45,77 40,82 8,82 3,77"/>
+<polygon points="0,41 5,46 5,67 0,72 -5,67 -5,46"/>
+<polygon points="0,9 5,14 5,35 0,40 -5,35 -5,14"/>
+<polygon points="8,36 40,36 45,41 40,46 8,46 3,41"/>
+</g>
+<g transform="translate(682,344.5)" fill="#333">
+<polygon points="8,0 40,0 45,5 40,10 8,10 3,5"/>
+<polygon points="8,72 40,72 45,77 40,82 8,82 3,77"/>
+<polygon points="0,41 5,46 5,67 0,72 -5,67 -5,46"/>
+</g>
+<g transform="translate(821,344.5)" fill="#333">
+<polygon points="43,9 48,14 48,35 43,40 38,35 38,14"/>
+<polygon points="0,41 5,46 5,67 0,72 -5,67 -5,46"/>
+</g>
+<g transform="translate(901,344.5)" fill="#333">
+<polygon points="8,36 40,36 45,41 40,46 8,46 3,41"/>
+</g>
+<g fill="#333"><rect x="768" y="363.5" width="9" height="11"/><rect x="768" y="395.5" width="9" height="11"/></g>
+<text x="1456" y="363.5" text-anchor="middle" font-family="sans-serif" font-size="68">変電所で火災</text>
+<text x="1456" y="448.5" text-anchor="middle" font-family="sans-serif" font-size="68">爆発物の痕跡あり</text>
+<text x="316" y="590.0" text-anchor="middle" font-family="sans-serif" font-size="74">C-02</text>
+<g transform="translate(602,524.0)" fill="#333">
+<polygon points="8,0 40,0 45,5 40,10 8,10 3,5"/>
+<polygon points="8,72 40,72 45,77 40,82 8,82 3,77"/>
+<polygon points="0,41 5,46 5,67 0,72 -5,67 -5,46"/>
+<polygon points="0,9 5,14 5,35 0,40 -5,35 -5,14"/>
+<polygon points="8,36 40,36 45,41 40,46 8,46 3,41"/>
+</g>
+<g transform="translate(682,524.0)" fill="#333">
+<polygon points="43,9 48,14 48,35 43,40 38,35 38,14"/>
+<polygon points="0,41 5,46 5,67 0,72 -5,67 -5,46"/>
+</g>
+<g transform="translate(821,524.0)" fill="#333">
+<polygon points="8,36 40,36 45,41 40,46 8,46 3,41"/>
+</g>
+<g transform="translate(901,524.0)" fill="#333">
+<polygon points="43,9 48,14 48,35 43,40 38,35 38,14"/>
+<polygon points="0,41 5,46 5,67 0,72 -5,67 -5,46"/>
+</g>
+<g fill="#333"><rect x="768" y="543.0" width="9" height="11"/><rect x="768" y="575.0" width="9" height="11"/></g>
+<text x="1456" y="587.0" text-anchor="middle" font-family="sans-serif" font-size="68">通信設備に侵入者</text>
+<text x="316" y="769.5" text-anchor="middle" font-family="sans-serif" font-size="74">C-06</text>
+<g transform="translate(602,703.5)" fill="#333">
+<polygon points="8,0 40,0 45,5 40,10 8,10 3,5"/>
+<polygon points="8,72 40,72 45,77 40,82 8,82 3,77"/>
+<polygon points="0,41 5,46 5,67 0,72 -5,67 -5,46"/>
+<polygon points="0,9 5,14 5,35 0,40 -5,35 -5,14"/>
+<polygon points="8,36 40,36 45,41 40,46 8,46 3,41"/>
+</g>
+<g transform="translate(682,703.5)" fill="#333">
+<polygon points="43,9 48,14 48,35 43,40 38,35 38,14"/>
+<polygon points="0,41 5,46 5,67 0,72 -5,67 -5,46"/>
+</g>
+<g transform="translate(821,703.5)" fill="#333">
+<polygon points="43,41 48,46 48,67 43,72 38,67 38,46"/>
+<polygon points="0,9 5,14 5,35 0,40 -5,35 -5,14"/>
+</g>
+<g transform="translate(901,703.5)" fill="#333">
+<polygon points="8,36 40,36 45,41 40,46 8,46 3,41"/>
+</g>
+<g fill="#333"><rect x="768" y="722.5" width="9" height="11"/><rect x="768" y="754.5" width="9" height="11"/></g>
+<text x="1456" y="722.5" text-anchor="middle" font-family="sans-serif" font-size="68">データセンターに不審者</text>
+<text x="1456" y="807.5" text-anchor="middle" font-family="sans-serif" font-size="68">不正プログラムを確認</text>
+<text x="316" y="965.0" text-anchor="middle" font-family="sans-serif" font-size="74">C-01</text>
+<g transform="translate(602,899.0)" fill="#333">
+<polygon points="8,0 40,0 45,5 40,10 8,10 3,5"/>
+<polygon points="8,72 40,72 45,77 40,82 8,82 3,77"/>
+<polygon points="0,41 5,46 5,67 0,72 -5,67 -5,46"/>
+<polygon points="0,9 5,14 5,35 0,40 -5,35 -5,14"/>
+<polygon points="8,36 40,36 45,41 40,46 8,46 3,41"/>
+</g>
+<g transform="translate(682,899.0)" fill="#333">
+<polygon points="43,9 48,14 48,35 43,40 38,35 38,14"/>
+<polygon points="0,41 5,46 5,67 0,72 -5,67 -5,46"/>
+</g>
+<g transform="translate(821,899.0)" fill="#333">
+<polygon points="0,41 5,46 5,67 0,72 -5,67 -5,46"/>
+<polygon points="0,9 5,14 5,35 0,40 -5,35 -5,14"/>
+</g>
+<g transform="translate(901,899.0)" fill="#333">
+<polygon points="8,36 40,36 45,41 40,46 8,46 3,41"/>
+</g>
+<g fill="#333"><rect x="768" y="918.0" width="9" height="11"/><rect x="768" y="950.0" width="9" height="11"/></g>
+<text x="1456" y="918.0" text-anchor="middle" font-family="sans-serif" font-size="68">不審者の目撃情報</text>
+<text x="1456" y="1003.0" text-anchor="middle" font-family="sans-serif" font-size="68">危険物所持の可能性</text>
+</svg>

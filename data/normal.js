@@ -2,7 +2,7 @@
  * NORMAL編・編集用シナリオデータ（仮稿）
  * テキスト、ヒント、選択肢、合言葉はここから変更できます。
  * 公開後は各ページのidを変えないでください（途中再開に使用）。
- * 正解: N-01 11月29日/15時32分, N-02 C01中央/C02東/C03西/C04学園, N-LAST echo。
+ * 正解: N-01 11月29日/15時32分, N-02 C01学園/C02東/C04中央/C06西, N-LAST echo。
  */
 window.HERO_NORMAL = {
   id: 'normal',
@@ -40,8 +40,8 @@ window.HERO_NORMAL = {
       prompt: '端末の数字表示がおかしくなった。表示の規則を見抜いて、今日の日付と現在時刻を答えよう。解答は数字4桁で入力できます。',
       image: 'assets/normal/n-01.png',
       fields: [
-        { label: '今日の日付', mode: 'digits', answers: ['1129'], placeholder: '例：1129' },
-        { label: '現在の時刻', mode: 'digits', answers: ['1532'], placeholder: '例：1532' }
+        { label: '今日の日付', mode: 'digits', answers: ['1129'], placeholder: '例：0407' },
+        { label: '現在の時刻', mode: 'digits', answers: ['1532'], placeholder: '例：0920' }
       ],
       hints: [
         'デジタル数字のようですが、このままでは読めません。',
@@ -62,23 +62,24 @@ window.HERO_NORMAL = {
     {
       id: 'n-02', type: 'puzzle', label: 'N-02 / 地区コード',
       title: '場所コード',
-      prompt: '左側の地区と右側のコードを、経路に沿って対応させよう。C-01〜C-04が表す場所を答えてください。',
-      image: 'assets/normal/n-02.png',
+      prompt: '地名のはじめの漢字を、①〜⑦の語群と組み合わせて言葉を作ろう。語群の番号が地区コードの数字になります。C-01・C-02・C-04・C-06が表す場所を答えてください。',
+      image: 'assets/normal/n-02-revision02.png',
+      prototype: '西地区の語の導出は確認中です。現時点では共有された想定の対応で採点しています。',
       fields: [
-        { label: 'C-01', answers: ['中央地区','中央'], placeholder: '地区名' },
+        { label: 'C-01', answers: ['響ヶ丘学園','響ケ丘学園','ひびきがおかがくえん','学園'], placeholder: '場所の名前' },
         { label: 'C-02', answers: ['東地区','東'], placeholder: '地区名' },
-        { label: 'C-03', answers: ['西地区','西'], placeholder: '地区名' },
-        { label: 'C-04', answers: ['響ヶ丘学園','響ケ丘学園','ひびきがおかがくえん','学園'], placeholder: '場所の名前' }
+        { label: 'C-04', answers: ['中央地区','中央'], placeholder: '地区名' },
+        { label: 'C-06', answers: ['西地区','西'], placeholder: '地区名' }
       ],
       hints: [
-        'あみだくじの要領で、コードと地区の場所をつなぎましょう。'
+        '地名の最初の漢字を取り出し、下の語群を続けたときの読みを考えてみましょう。'
       ]
     },
     {
       id: 'n-after-02', type: 'story', label: 'N-02 / 解析結果',
       title: '4つの通信先',
       paragraphs: [
-        '「C-01は中央地区、C-02は東地区、C-03は西地区……そして、C-04が響ヶ丘学園！」',
+        '「C-01は響ヶ丘学園、C-02は東地区、C-04は中央地区、C-06が西地区！」',
         'あなたが読み上げると、先輩はモニターをたたいた。',
         '「これで全部の場所がわかったね。時刻の補正も合わせて、通信ログをもう一度見てみよう！」',
         '「あとは、一番新しい通報がどこかを確かめるだけですね」',
@@ -89,7 +90,7 @@ window.HERO_NORMAL = {
       id: 'n-last', type: 'puzzle', label: 'N-LAST / 最後の指令',
       title: '誰に連絡する？',
       prompt: '現在は15:32。時刻と場所を復元し、4件のうち最も新しい通報があった場所を確認しよう。そこを担当するヒーローを選んでください。',
-      image: 'assets/normal/n-last.png',
+      image: 'assets/normal/n-log-revision02.svg',
       note: '※ ヒーローの名前（エコー以外）は仮設定です。画面の「連絡先」は作中設定です。',
       choices: [
         { value: 'volt', label: 'ボルト', description: '中央地区を担当' },

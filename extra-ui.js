@@ -58,19 +58,22 @@
     mail.append(head,c.el('blockquote','','「変な指令が続いてる。もし私と連絡が取れなくなったら、添付の資料を調べて。今日、手伝ってくれたあの人なら、きっと気づいてくれると思う」'));target.append(mail);
     const assets=[{id:'A',files:['ex01_1.png']},{id:'B',files:['ex01_2-1.png','ex01_2-2.png']},{id:'C',files:['ex01_3-1.png','ex01_3-2.png']},{id:'D',files:['ex01_4.png']}];
     tabs(c,target,assets.map(a=>({id:a.id,label:'資料 '+a.id,render:panel=>{panel.append(c.el('h3','','添付資料 '+a.id));const stack=c.el('div','extra-image-stack');a.files.forEach((src,i)=>stack.append(c.makeImage('assets/extra/'+src,`資料${a.id} ${i+1}`)));panel.append(stack);}})),'firstTab');
-    const f=formBase(c,target,page.id);f.append(c.el('h3','','消えた番号を戻す'),c.el('p','extra-footer-note','資料A〜Dは掲載順です。ヒント番号の順ではありません。'));
-    const grid=c.el('div','extra-restore-grid');const order=assets.map(a=>{const x=field(c,f,'order'+a.id,'資料'+a.id+'のヒント番号',[1,2,3,4].map(n=>({value:String(n),label:'ヒント '+n})));grid.append(x.box);return x.input;});f.append(grid);
-    const answers=c.el('div','extra-answers');const words=[1,2,3,4].map(n=>{const x=field(c,f,'hint'+n,'ヒント'+n+'の答え');answers.append(x.box);return x.input;});f.append(answers);submitButton(c,f,'4つのヒントを復元する →');const fb=feedback(c);f.append(fb);
-    f.addEventListener('submit',e=>{e.preventDefault();const mapping=order.every((x,i)=>x.value===D.cardOrder[i]);const valid=words.every((x,i)=>good(c,x.value,D.firstAnswers[i]));if(!mapping||!valid){fb.textContent='番号と答えの組み合わせが一致しません。各資料で消えている数字と、過去の事件を見直しましょう。';return;}c.complete(page.id,[...order.map(x=>x.value),...words.map(x=>x.value)]);lockForm(c,page,f,fb,'4つのヒントを復元しました！ 次へ進めます。');});
+    const entries=draft(c,page.id),previous=c.save.answerEntries[page.id]||[];
+    assets.forEach((a,i)=>{const number=Number(D.cardOrder[i]);if(entries['answer'+a.id]===undefined)entries['answer'+a.id]=entries['hint'+number]||previous[3+number]||'';});c.persist();
+    const f=formBase(c,target,page.id);f.append(c.el('h3','','1．各資料の答えを解く'),c.el('p','extra-footer-note','資料A〜Dを解き、その資料から得られた答えを入力してください。'));
+    const answers=c.el('div','extra-answers');const words=assets.map(a=>{const x=field(c,f,'answer'+a.id,'資料'+a.id+'の答え');answers.append(x.box);return x.input;});f.append(answers);
+    f.append(c.el('h3','','2．File番号を復元する'),c.el('p','extra-footer-note','各資料から消えた数字が、エコーの付けたFile番号です。資料A〜Dの掲載順とは異なります。'));
+    const grid=c.el('div','extra-restore-grid');const order=assets.map(a=>{const x=field(c,f,'order'+a.id,'資料'+a.id+'のFile番号',[1,2,3,4].map(n=>({value:String(n),label:'File-'+n})));grid.append(x.box);return x.input;});f.append(grid);submitButton(c,f,'4つのFileを復元する →');const fb=feedback(c);f.append(fb);
+    f.addEventListener('submit',e=>{e.preventDefault();const mapping=order.every((x,i)=>x.value===D.cardOrder[i]);const valid=words.every((x,i)=>good(c,x.value,D.firstAnswers[Number(D.cardOrder[i])-1]));if(!mapping||!valid){fb.textContent='File番号と答えの組み合わせが一致しません。各資料で消えている数字と、過去の事件を見直しましょう。';return;}const fileAnswers=[1,2,3,4].map(n=>words[D.cardOrder.indexOf(String(n))].value);c.complete(page.id,[...order.map(x=>x.value),...fileAnswers]);lockForm(c,page,f,fb,'4つのFileを復元しました！ 次へ進めます。');});
     lockForm(c,page,f,fb);
-    hints(c,target,['どの数字が消えているかが、ヒント番号の手掛かりです。問題画像のファイル名や掲載順で判断しないでください。','資料Aの丸には太陽系の8惑星を入れます。「2・8」が金・海なら、消えた数字を戻した「3・4」は？','資料Bは五十音表。赤枠を立方体の展開図として組み立てます。向きが変わった文字に注意。','資料Cの大きな空白に「4」を戻し、方角を示すものとして見立てます。色付きの文字は五十音順で前後へ。赤と緑のエラーにも注意。','資料DはHARDで救出した子どもたちの場所です。問題文から消えた「1」が番号の手掛かりになります。']);
+    hints(c,target,['どの数字が消えているかが、File番号の手掛かりです。画像の掲載順で判断しないでください。','資料Aの丸には太陽系の8惑星を入れます。「2・8」が金・海なら、消えた数字を戻した「3・4」は？','資料Bは五十音表。赤枠を立方体の展開図として組み立てます。向きが変わった文字に注意。','資料Cの大きな空白に「4」を戻し、方角を示すものとして見立てます。色付きの文字は五十音順で前後へ。赤と緑のエラーにも注意。','資料DはHARDで救出した子どもたちの場所です。問題文から消えた「1」がFile番号の手掛かりになります。']);
   }
   function firstDoor(page,target,c){
-    target.append(c.makeImage('assets/extra/ex01_last.png','First Missionの最終指示'));
+    const instruction=c.el('section','extra-file-instruction');instruction.append(c.el('h3','','First Mission'),c.el('p','','File-1の File-3の\nFile-2室の File-4扉を開けろ'));target.append(instruction);
     target.append(c.el('p','extra-lead','復元した4つの答えを、指示文へ当てはめよう。'));
     const f=formBase(c,target,page.id);const grid=c.el('div','extra-answers');
     const loc=field(c,f,'place','向かう場所');const color=field(c,f,'color','開ける扉の実物の色',[{value:'red',label:'赤い扉'},{value:'green',label:'緑の扉'},{value:'blue',label:'青い扉'},{value:'yellow',label:'黄色の扉'}]);grid.append(loc.box,color.box);f.append(grid);submitButton(c,f,'この場所の扉を開ける →');const fb=feedback(c);f.append(fb);
-    f.addEventListener('submit',e=>{e.preventDefault();if(good(c,loc.input.value,['旧校舎地下機械室','旧校舎の地下の機械室','旧校舎地下の機械室'])&&color.input.value==='red'){c.complete(page.id,[loc.input.value,color.input.value]);lockForm(c,page,f,fb,'赤い扉が開いた。図面にない制御室へ進めます。');}else fb.textContent='ヒント1・3・2・4の順で指示を読み直してください。場所は建物名から、色は実物の色で答えます。';});lockForm(c,page,f,fb);
+    f.addEventListener('submit',e=>{e.preventDefault();if(good(c,loc.input.value,['旧校舎地下機械室','旧校舎の地下の機械室','旧校舎地下の機械室'])&&color.input.value==='red'){c.complete(page.id,[loc.input.value,color.input.value]);lockForm(c,page,f,fb,'赤い扉が開いた。図面にない制御室へ進めます。');}else fb.textContent='File-1・3・2・4の順で指示を読み直してください。場所は建物名から、色は実物の色で答えます。';});lockForm(c,page,f,fb);
   }
   function maze(page,target,c){
     target.append(c.el('p','extra-lead','白い入口から進み、同じ色の扉をワープして文字をたどろう。'));

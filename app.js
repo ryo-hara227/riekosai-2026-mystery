@@ -28,7 +28,7 @@
   let save = null;
   const course = () => COURSES[courseId];
   const pages = () => course().pages;
-  const defaultSave = id => ({ version:4, started:false, currentPageId:COURSES[id].pages[0].id, completedPuzzleIds:[], answerEntries:{}, notifications:[],journal:[],cleared:false });
+  const defaultSave = id => ({ version:4,...(id==='normal'?{normalCodesVersion:2}:{}), started:false, currentPageId:COURSES[id].pages[0].id, completedPuzzleIds:[], answerEntries:{}, notifications:[],journal:[],cleared:false });
   function loadSave(id) {
     try {
       const raw = JSON.parse(localStorage.getItem(STORAGE_KEYS[id])||'null')||memorySaves[id];
@@ -38,6 +38,12 @@
         notifications:Array.isArray(raw.notifications)?raw.notifications:[],journal:Array.isArray(raw.journal)?raw.journal:[],
         answerEntries: raw.answerEntries && typeof raw.answerEntries === 'object' && !Array.isArray(raw.answerEntries) ? raw.answerEntries : {}
       };
+      if(id==='easy')record.notifications=record.notifications.map(n=>n.id==='e-after-01'?{...n,title:HERO_STORY.notices['e-after-01'].message,body:HERO_STORY.notices['e-after-01'].body}:n);
+      if(id==='normal'){
+        record.journal=record.journal.map(a=>a.src==='assets/normal/n-last.png'?{...a,src:'assets/normal/n-log-revision02.svg'}:a.src==='assets/normal/n-02.png'?{...a,src:'assets/normal/n-02-revision02.png'}:a);
+        if(raw.normalCodesVersion!==2&&Array.isArray(record.answerEntries['n-02'])){const old=record.answerEntries['n-02'];record.answerEntries['n-02']=[old[3]||'',old[1]||'',old[0]||'',old[2]||''];}
+        record.normalCodesVersion=2;
+      }
       if(id==='extra'&&raw.version!==4){record.completedPuzzleIds=record.completedPuzzleIds.filter(x=>!['x-last','x-last-reason'].includes(x));record.extra={...(record.extra||{}),patchApplied:false,location:null,dispatched:false,repairVersion:2};if(raw.cleared||['x-last','x-rescue','x-clear'].includes(raw.currentPageId)){record.currentPageId='x-confront';record.cleared=false;}record.updatedLast=true;}record.version=4;return record;
     } catch { return memorySaves[id]||defaultSave(id); }
   }
@@ -113,7 +119,7 @@
     const frag = document.createDocumentFragment();
     const frame = el('div','puzzle-image-frame');
     const img = el('img');
-    img.src = `./${src}?v=4`;
+    img.src = `./${src}?v=5-rev02`;
     img.alt = `${label}の画像`;
     img.loading = 'eager';
     img.addEventListener('error',()=>{ frame.textContent = `画像が見つかりません：${src}`; });
@@ -125,7 +131,7 @@
     frag.appendChild(zoom); return frag;
   }
   function openImage(src,label) {
-    get('enlargedImage').src = `./${src}?v=4`;
+    get('enlargedImage').src = `./${src}?v=5-rev02`;
     get('enlargedImage').alt = `${label}・拡大表示`;
     if (typeof imageDialog.showModal === 'function') imageDialog.showModal();
     else window.open(`./${src}`,'_blank','noopener');
@@ -303,7 +309,7 @@
   get('extraResumeBtn').addEventListener('click',()=>enterCourse('extra',false));
   get('prologueStartBtn').addEventListener('click',()=>enterCourse('prologue',false));
   get('homeBtn').addEventListener('click',navigateHome);
-  get('logBtn').addEventListener('click',()=>openImage('assets/normal/n-last.png','緊急通信ログ'));
+  get('logBtn').addEventListener('click',()=>openImage('assets/normal/n-log-revision02.svg','緊急通信ログ'));
   prevBtn.addEventListener('click',()=>{ if(courseId==='hard'&&pages()[currentIndex].id==='h-rescue'&&(save.answerEntries['h-map-first']||[])[0]==='old'&&(save.answerEntries['h-code-first']||[])[0]==='1129') navigatePage(indexForId('h-code-first')); else navigatePage(currentIndex-1); });
   nextBtn.addEventListener('click',()=>{ if (!nextBtn.disabled&&currentIndex<pages().length-1) navigatePage(courseId==='hard'?nextHardIndex(pages()[currentIndex]):currentIndex+1); });
   get('resetBtn').addEventListener('click',()=>{
@@ -320,7 +326,7 @@
         save.answerEntries[id]=entries;persist();
         if(pages()[currentIndex].id===id) { nextBtn.disabled=false;nextBtn.textContent='完了！ 次へ →'; }
       },
-      openLink:showHeroLink,openImage,navigatePage,navigateHome,
+      openLink:showHeroLink,closeLink:()=>linkDialog.close(),openImage,navigatePage,navigateHome,
       finishIntro(){save.cleared=true;persist();const next=pendingCourse;pendingCourse=null;if(next)enterCourse(next.id,next.restart);else navigateHome();},
       writeSave(id,record){memorySaves[id]=record;try{localStorage.setItem(STORAGE_KEYS[id],JSON.stringify(record));}catch{}if(id===courseId)save=record;updateUnread();},
       refresh:renderPage
