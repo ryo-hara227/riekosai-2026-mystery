@@ -109,11 +109,10 @@
     const fb=feedback(c);target.append(button(c,'資料を確認し、調査を始める →',()=>{c.complete(page.id,['read']);fb.textContent='資料を保存しました。次へ進めます。';fb.classList.add('is-ok');}),fb);if(completed(c,page)){fb.textContent='資料は確認済みです。次へ進めます。';fb.classList.add('is-ok');}
   }
   function directivePanel(c,p){
-    p.append(c.el('h3','','指令履歴と受付原簿'),c.el('p','extra-footer-note','H-101〜104は提供表を文章化。H-105以降は試作用の追加です。「受付原簿」のIDは照合用の仮資料です。'));
+    p.append(c.el('h3','','指令履歴と受付原簿'),c.el('p','extra-footer-note','「受付原簿」のIDは照合用の仮資料です。'));
     const controls=c.el('div','extra-filter');const category=c.el('select');category.setAttribute('aria-label','受付種別で絞り込む');['すべて','緊急','正式依頼'].forEach(x=>category.append(new Option(x,x)));const label=c.el('label');const missing=c.el('input');missing.type='checkbox';label.append(missing,c.el('span','','応答無しのみ'));controls.append(category,label);p.append(controls);const results=c.el('div');p.append(results);
     function draw(){results.replaceChildren();const rows=D.directives.filter(r=>(category.value==='すべて'||r[1]===category.value)&&(!missing.checked||r[4].includes('応答無し')));const body=table(c,results,['指令番号','受付種別','対象','内容','対処状況','受付原簿'],rows,'指令履歴');Array.from(body.children).forEach((tr,i)=>{if(rows[i][5]==='—')tr.classList.add('is-missing');if(rows[i][0]===D.lastCommand)tr.classList.add('is-last');});}
     category.addEventListener('change',draw);missing.addEventListener('change',draw);draw();
-    const original=c.el('details');original.append(c.el('summary','','提供されたログ表の原図を見る'));original.append(c.makeImage('assets/extra/directive-original.png','指令履歴原図・画像7'));p.append(original);
   }
   function doorPanel(c,p){
     p.append(c.el('h3','','扉の開閉記録'),c.el('p','','NORMALで見た数字の表示エラーが残っている。エコーの最後の接続時刻と、どの扉の記録が一致するだろう。'));
@@ -134,7 +133,7 @@
     const a=field(c,f,'command','エコーへの最後の指令番号');const b=field(c,f,'relay','全員に共通する最後の中継器番号');const d=field(c,f,'door','エコーの最終接続時刻と一致する扉',D.doors.map(x=>({value:x.code,label:x.code})));grid.append(a.box,b.box,d.box);f.append(grid);
     const finding=field(c,f,'finding','記録から読み取れること',[{value:'false',label:'未受付の旧校舎要請が繰り返され、応答が途絶えた'},{value:'normal',label:'正式な要請だけが記録されている'},{value:'dead',label:'応答がないので生存していないと断定できる'}]);f.append(finding.box);submitButton(c,f,'調査結果を報告する →');const fb=feedback(c);f.append(fb);
     f.addEventListener('submit',e=>{e.preventDefault();if(good(c,a.input.value,[D.lastCommand,D.lastCommand.replace('H-','')])&&good(c,b.input.value,[D.finalRelay,'9'])&&d.input.value===D.lastDoor&&finding.input.value==='false'){c.complete(page.id,[a.input.value,b.input.value,d.input.value,finding.input.value]);lockForm(c,page,f,fb,'旧校舎地下の同じ設備系統に集まっていた。次は、現在の生存を確認しよう。');}else fb.textContent='照合結果に一致しない項目があります。最後の指令、共通の中継器、最終接続時刻をそれぞれ確認してください。';});lockForm(c,page,f,fb);
-    hints(c,target,['指令履歴の最後まで見てください。正常な依頼は受付原簿にも番号があります。','3つの経路が異なっていても、最後の番号は共通しています。図面の丸数字と照合します。','エコーの最終接続は20:16です。この版では「試作用の復元時刻」の表を使って照合します。応答なしだけでは、生死を判断できません。']);
+    hints(c,target,['指令履歴の最後まで見てください。正常な依頼は受付原簿にも番号があります。','通った経路が異なっていても、最後の番号は共通しています。図面の丸数字と照合します。','エコーの最終接続は20:16です。この版では「試作用の復元時刻」の表を使って照合します。応答なしだけでは、生死を判断できません。']);
   }
   function survival(page,target,c){
     const s=state(c);target.append(c.el('p','','制御室には、装備点検用の近距離信号を受信する端末がある。HERO LINKに、一時的な受信拡張を追加できそうだ。'));

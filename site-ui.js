@@ -52,14 +52,76 @@
    if([1,3,5].includes(stage))timer=setTimeout(()=>{if(live())setStage(stage+1);},650);
   }draw();
  }
- function reason(page,target,c){copy(target,page.paragraphs);const wrap=el('div','extra-table-scroll');const table=el('table','extra-table');const header=el('tr');['記録','発信者区分','信号','分類先','救援受理'].forEach(t=>header.append(el('th','',t)));const head=el('thead');head.append(header);table.append(head);const body=el('tbody');[['NORMALの対応済み要請','市民','非常用SOS','救援受付','受理番号あり'],['過去の事故の装備記録','ヒーロー','非常用SOS','装備異常','受理番号なし'],['現在のエコーたちの記録','ヒーロー','非常用SOS','装備異常','受理番号なし']].forEach(row=>{const tr=el('tr');row.forEach(x=>tr.append(el('td','',x)));body.append(tr);});table.append(body);wrap.append(table);target.append(wrap,el('p','prototype-note','比較資料と推理の回答形式は操作試作です。欠陥の設定は承認稿に合わせています。'));
+ function rescueRecordCard(record,open){
+  const card=el('details','notification-card rescue-record');card.open=open;
+  card.append(el('summary','','救援受付記録 '+record.id));
+  const fields=el('dl','rescue-record-fields');
+  const entries=[['発信者区分',record.sender],['信号',record.signal],['通報内容',record.message],
+   ['分類先',record.classification],['受理番号',record.id],['担当',record.hero]];
+  entries.forEach(([label,value])=>fields.append(el('dt','',label),el('dd','',value)));
+  const history=el('ol','rescue-record-history');
+  record.history.forEach(([clock,message])=>{
+   const step=el('li');const time=el('time','',clock);time.dateTime=clock;
+   step.append(time,el('span','',message));history.append(step);
+  });
+  card.append(fields,el('h4','','対応履歴'),history);
+  return card;
+ }
+ function materials(target,c,page){
+  target.append(el('h3','','入手した資料'));
+  const normal=c.courseId==='normal'?c.save:c.loadSave('normal');
+  const viewingTutorial=page?.tutorial==='normal';
+  let count=0;
+  if(viewingTutorial||normal.cleared||normal.tutorialTasks?.['n-tutorial']?.materials||normal.completedPuzzleIds.includes('n-tutorial')){
+   target.append(rescueRecordCard(c.courses.normal.rescueRecord,viewingTutorial));
+   count++;
+  }
+  Object.entries(c.courses).forEach(([id,course])=>{
+   const record=id===c.courseId?c.save:c.loadSave(id);
+   const assets=[...record.journal];
+   if(record.cleared)course.pages.forEach(page=>{
+    if(page.image&&page.type!=='flow'&&!assets.some(asset=>asset.src===page.image)){
+     assets.push({src:page.image,title:page.imageLabel||page.title});
+    }
+   });
+   assets.forEach(asset=>{
+    count++;
+    target.append(button(c,id.toUpperCase()+'：'+asset.title,()=>c.openImage(asset.src,asset.title),'btn btn--outline material-button'));
+   });
+  });
+  if(page?.tutorial==='intro'){
+   const demo=el('article','notification-card');
+   demo.append(el('h4','','学園祭・協力メンバー向けの案内'),el('p','','通知は履歴に残ります。入手した資料は、この一覧から再確認できます。'));
+   target.prepend(demo);
+  }else if(!count)target.append(el('p','','物語で資料を入手すると、この一覧に追加されます。'));
+ }
+ function reason(page,target,c){
+  copy(target,page.paragraphs);
+  const record=c.courses.normal.rescueRecord;
+  target.append(rescueRecordCard(record,false));
+  const wrap=el('div','extra-table-scroll');
+  const table=el('table','extra-table');
+  const header=el('tr');
+  ['記録','発信者区分','信号','分類先','救援受理'].forEach(text=>{
+   const cell=el('th','',text);cell.scope='col';header.append(cell);
+  });
+  const head=el('thead');head.append(header);table.append(head);
+  const body=el('tbody');
+  const rows=[
+   ['市民の救援受付記録',record.sender,record.signal,record.classification,record.id],
+   ['過去の事故の装備記録','ヒーロー','非常用SOS','装備異常','受理番号なし'],
+   ['現在のエコーたちの記録','ヒーロー','非常用SOS','装備異常','受理番号なし']
+  ];
+  rows.forEach(row=>{const tr=el('tr');row.forEach(value=>tr.append(el('td','',value)));body.append(tr);});
+  table.append(body);wrap.append(table);
+  target.append(wrap,el('p','prototype-note','比較資料と推理の回答形式は操作試作です。欠陥の設定は承認稿に合わせています。'));
   const form=el('form','answer-form');const label=el('label','','何が救援の受理を分けている？');const select=el('select');select.id='reason-policy';label.htmlFor=select.id;[['','選択してください'],['sender','発信者が市民かヒーローかで、SOSの分類先が変わる'],['offline','HERO LINKの通信がすべて停止している'],['place','地下の場所が未登録だから届かない'],['ignored','ヒーローが受信して無視している']].forEach(([v,t])=>select.append(new Option(t,v)));const send=el('button','btn btn--night','記録から指摘する');send.type='submit';const fb=el('p','answer-feedback');fb.setAttribute('role','status');form.append(label,select,send,fb);if(c.save.completedPuzzleIds.includes(page.id)){send.disabled=true;select.disabled=true;select.value='sender';fb.textContent='推理を確認済みです。';}form.addEventListener('submit',e=>{e.preventDefault();if(select.value!=='sender'){fb.textContent='同じSOSでも、発信者区分と分類先が異なる点を比べてください。';return;}c.complete(page.id,['sender']);select.disabled=true;send.disabled=true;fb.textContent='ヒーローの非常用SOSだけが、救援として扱われていません。';fb.classList.add('is-ok');});target.append(form);
  }
  function tabs(target,items,selected,onSelect){const bar=el('nav','extra-tabs');bar.setAttribute('aria-label','HERO LINKの機能');const panel=el('section','link-panel');const controls=[];items.forEach(item=>{const b=button(null,item.label,()=>open(item.id),'');controls.push([item,b]);bar.append(b);});target.append(bar,panel);function open(id){const item=items.find(x=>x.id===id)||items[0];controls.forEach(([a,b])=>b.setAttribute('aria-pressed',String(a.id===item.id)));panel.replaceChildren();activeLinkTab=item.id;onSelect?.(item.id);item.render(panel);}open(selected);}
  function link(target,c,page,requested){
   const active=page&&c.courseId;const items=[{id:'mission',label:'通知・指令',render:p=>{p.append(el('h3','','現在の任務'),el('p','',active?c.courses[active].title+'／'+page.title:'ミッションを選択してください。'));if(page?.id==='n-last')c.renderPuzzle(page,p);if(page?.type==='contact')contactPanel(page,p,c);}},
    {id:'notifications',label:'通知履歴',render:p=>{p.append(el('h3','','届いた通知'));let count=0;Object.keys(c.courses).forEach(id=>{const r=id===c.courseId?c.save:c.loadSave(id);r.notifications.forEach(n=>{count++;const card=el('article','notification-card');card.append(el('small','',id.toUpperCase()),el('h4','',n.title),el('p','',n.body));if(!n.read)card.append(button(c,'既読にする',()=>{n.read=true;c.writeSave(id,r);card.classList.add('is-read');},'btn btn--outline'));p.append(card);});});if(!count)p.append(el('p','','まだ通知はありません。'));}},
-   {id:'materials',label:'資料',render:p=>{p.append(el('h3','','入手した資料'));let count=0;Object.keys(c.courses).forEach(id=>{const r=id===c.courseId?c.save:c.loadSave(id);const assets=[...r.journal];if(r.cleared)c.courses[id].pages.filter(p=>p.image&&p.type!=='flow').forEach(p=>{if(!assets.some(a=>a.src===p.image))assets.push({src:p.image,title:p.imageLabel||p.title});});assets.forEach(a=>{count++;p.append(button(c,id.toUpperCase()+'：'+a.title,()=>c.openImage(a.src,a.title),'btn btn--outline material-button'));});});if(page?.type==='tutorial'){const demo=el('article','notification-card');demo.append(el('h4','','学園祭・協力メンバー向けの案内'));if(page.tutorial==='normal')demo.append(el('p','','市民のSOS → 本部が受理（受理番号あり）→ 担当ヒーローが受信 → 応答 → 対応完了。送信と受信・受理は、それぞれ別の状態です。'));else demo.append(el('p','','通知は履歴に残ります。入手した資料は、この一覧から再確認できます。'));p.prepend(demo);}else if(!count)p.append(el('p','','物語で資料を入手すると、この一覧に追加されます。'));}},
+   {id:'materials',label:'資料',render:p=>materials(p,c,page)},
    {id:'activity',label:'活動記録',render:p=>{p.append(el('h3','','ミッションの進捗'));Object.keys(c.courses).forEach(id=>{const r=id===c.courseId?c.save:c.loadSave(id);p.append(el('p','',id.toUpperCase()+'：'+(r.cleared?'CLEAR':r.started?'挑戦中':'未挑戦')));});}},
    {id:'board',label:'掲示板',render:p=>window.HERO_BOARD.render(p)}];
   if(c.courseId==='extra'&&c.save.completedPuzzleIds.includes('x-documents'))items.push({id:'investigate',label:'記録調査',render:p=>HERO_EXTRA_UI.renderEvidence(p,c)});

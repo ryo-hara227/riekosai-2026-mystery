@@ -11,7 +11,9 @@
  const n=HERO_NORMAL.pages.find(p=>p.id==='n-opening');
  const at=n.paragraphs.findIndex(t=>t.includes('担当者が、HERO LINKの画面を開いた'));
  const alarm=n.paragraphs.findIndex(t=>t.includes('その言葉を遮るように'));
- const tutorial=n.paragraphs.slice(at,alarm);const rest=n.paragraphs.slice(alarm);n.paragraphs=n.paragraphs.slice(0,at);delete n.image;
+ const tutorial=n.paragraphs.slice(at,alarm-1);
+ const rest=['案内を閉じたところで、警告音が鳴った。',...n.paragraphs.slice(alarm+1)];
+ n.paragraphs=n.paragraphs.slice(0,at);delete n.image;
  HERO_NORMAL.pages.splice(1,0,{id:'n-tutorial',type:'tutorial',tutorial:'normal',label:'N-00 / HERO LINK',title:'声を届ける準備',paragraphs:tutorial},{id:'n-alert',type:'story',label:'N-00 / 緊急通信',title:'読めない通信ログ',paragraphs:rest,image:'assets/normal/n-log-revision02.svg'});
  HERO_NORMAL.pages.find(p=>p.id==='n-dispatch').type='contact';
  HERO_HARD.pages.find(p=>p.id==='h-ready').note='小問は同じページで切り替わります。選択履歴から前の小問を見直せます。';

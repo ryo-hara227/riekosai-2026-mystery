@@ -9,6 +9,19 @@ window.HERO_NORMAL = {
   title: '緊急指令！街を守れ！',
   subtitle: 'NORMAL MISSION / 所要時間の目安：約15分',
   extraKeyword: 'つなぐ', // 仮の合言葉。EXTRAの正式な合言葉が決まったら変更
+  rescueRecord: {
+    id: 'R-072',
+    sender: '市民',
+    signal: '非常用SOS',
+    classification: '救援受付',
+    message: '商店街の入口で人が転び、立ち上がれません。',
+    hero: 'ボルト',
+    history: [
+      ['10:12', '通信本部がSOSを受信し、救援要請として受理。'],
+      ['10:13', 'ボルトが指令を受信。「現場に向かいます」'],
+      ['10:19', 'ボルトより報告。「救護班に引き継ぎました」対応完了。']
+    ]
+  },
   pages: [
     {
       id: 'n-opening', type: 'story', label: 'N-00 / オープニング',

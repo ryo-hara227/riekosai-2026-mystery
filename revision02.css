@@ -14,4 +14,10 @@
 .extra-file-instruction{border:2px solid #294e65;border-radius:12px;background:#fffef7;padding:28px 20px;margin:20px 0;text-align:center;color:#183c55}
 .extra-file-instruction h3{font-size:22px;margin:0 0 16px}
 .extra-file-instruction p{font-size:clamp(20px,3.9vw,34px);font-weight:800;line-height:1.9;white-space:pre-line;margin:0}
+.rescue-record summary{cursor:pointer;font-weight:800;color:#193e56}
+.rescue-record-fields{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:8px 14px;margin:16px 0;line-height:1.65}
+.rescue-record-fields dt,.rescue-record-history time{font-weight:800;color:#37586a}
+.rescue-record-fields dd{margin:0;overflow-wrap:anywhere}
+.rescue-record-history{list-style:none;padding:0;margin:0}
+.rescue-record-history li{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:12px;padding:9px 0;border-top:1px solid #d7e5ed;line-height:1.65}
 @media(max-width:730px){.cover__description{font-size:18px}.contact-channel{padding:12px}.contact-channel-head{align-items:flex-start}.contact-bubble{max-width:94%;padding:12px}.extra-file-instruction{padding:22px 12px}}
