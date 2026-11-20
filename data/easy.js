@@ -7,7 +7,6 @@ window.HERO_EASY = {
   id: 'easy',
   title: 'ヒーロー、出動できません！',
   subtitle: 'EASY MISSION / 所要時間の目安：約15分',
-  extraKeyword: 'みつける',  // 【仮】EXTRAの正式な合言葉が決まったら変更
   pages: [
     {
       id: 'e-opening', type: 'story', label: 'E-00 / オープニング',
@@ -125,7 +124,6 @@ window.HERO_EASY = {
     {
       id: 'e-puzzle-03', type: 'puzzle', label: 'E-03 / 会場マップ',
       title: '学園祭会場を探せ！', image: 'assets/easy/e-03-map.svg',
-      note: '※ 地図は仮版です。施設配置・色・道順は試遊後に調整できます。',
       prompt: 'あの子のメモを読んで、向かった場所の名前を答えよう。',
       quote: [
         'きたのもんから はいったよ。',

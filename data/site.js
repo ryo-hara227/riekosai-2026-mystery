@@ -21,15 +21,13 @@
  HERO_HARD.pages.filter(p=>p.type==='map').forEach(p=>{p.type='flow';p.prompt='小問の答えを2択から選び、最後に着いた建物を報告してください。選択した経路は保存されます。';p.hints=['赤から緑の向きで読み、意味が通る方を選びます。監視画像の色と、実際に見た色の関係も確認しましょう。','H1-08では、直前の問題画像のインク汚れに戻って確かめてください。前の小問へ戻ることができます。'];});
  const story=(id,title,paras,label='EXTRA / STORY')=>({id,type:'story',title,paragraphs:paras,label});
  const old=Object.fromEntries(HERO_EXTRA.pages.map(p=>[p.id,{...p}]));
- old['x-unlock'].prototype='3つのミッションをクリアすると自動解放します。試遊用の解放・旧版の合言葉も利用できます。';
  old['x-first'].paragraphs=S.ex.mail;old['x-first'].title='消えた数字、4つのFile';
  old['x-survival'].paragraphs=S.ex.survival.slice(0,5);
  old['x-last'].paragraphs=S.ex.repair;
- old['x-last'].prototype='承認済みの欠陥設定に合わせた操作試作です。救援の分類修正・位置取得・救助連絡は物語内の演出です。';
- HERO_EXTRA.pages=[old['x-unlock'],{...story('x-opening','後夜祭を前に',S.ex.opening),notification:{system:'HERO LINK',...S.notices['x-opening']}},old['x-first'],old['x-first-door'],story('x-door-story','赤い扉の向こう',S.ex.door),story('x-control','最後の扉',S.ex.control),old['x-second'],old['x-documents'],story('x-investigate-intro','記録をつなぐ',S.ex.investigation),old['x-third'],story('x-relay','地図の先',S.ex.afterInvestigation),old['x-survival'],story('x-survival-story','……生きてる！',S.ex.survival),story('x-confront','かつてのヒーロー',S.ex.confrontation),{id:'x-last-reason',type:'extra',scene:'reason',label:'EX-LAST / 記録の比較',title:'届かなかった声',paragraphs:S.ex.reason},old['x-last'],{...story('x-rescue','今度は、届いた',S.ex.rescue),notification:{system:'HERO LINK',...S.notices['x-rescue']}},story('x-thanks','あなたのヒーロー',S.ex.thanks),story('x-return','帰り道',S.ex.return),story('x-epilogue','もうひとつの学園祭へ',S.ex.epilogue),old['x-clear']];
+ HERO_EXTRA.pages=[{...story('x-opening','後夜祭を前に',S.ex.opening),notification:{system:'HERO LINK',...S.notices['x-opening']}},old['x-first'],old['x-first-door'],story('x-door-story','赤い扉の向こう',S.ex.door),story('x-control','最後の扉',S.ex.control),old['x-second'],old['x-documents'],story('x-investigate-intro','記録をつなぐ',S.ex.investigation),old['x-third'],story('x-relay','地図の先',S.ex.afterInvestigation),old['x-survival'],story('x-survival-story','……生きてる！',S.ex.survival),story('x-confront','かつてのヒーロー',S.ex.confrontation),{id:'x-last-reason',type:'extra',scene:'reason',label:'EX-LAST / 記録の比較',title:'届かなかった声',paragraphs:S.ex.reason},old['x-last'],{...story('x-rescue','今度は、届いた',S.ex.rescue),notification:{system:'HERO LINK',...S.notices['x-rescue']}},story('x-thanks','あなたのヒーロー',S.ex.thanks),story('x-return','帰り道',S.ex.return),story('x-epilogue','もうひとつの学園祭へ',S.ex.epilogue),old['x-clear']];
  HERO_EXTRA.config.repairVersion=2;
  HERO_EXTRA.pages.find(p=>p.id==='x-door-story').paragraphs=S.ex.firstResult.concat(S.ex.door);
- window.HERO_SITE={version:5,
+ window.HERO_SITE={version:6,
   flow:{
    '01':{choices:[{label:'機械',image:'assets/hard/machine.png',next:'02'},{label:'離島',image:'assets/hard/island.png',next:'05'}]},
    '02':{choices:[{label:'50',next:'03'},{label:'100',place:'library'}]},

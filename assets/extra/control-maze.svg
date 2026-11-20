@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 1125" role="img" aria-labelledby="title">
+  <title id="title">制御室のフロアマップ</title>
+  <defs>
+    <g id="door">
+      <path d="M-75 98l15-15H60l15 15Z" fill="#a5a8ac"/>
+      <path d="M-62 84V-74q0-16 16-16h92q16 0 16 16V84Z" fill="currentColor" stroke="#172535" stroke-width="4"/>
+      <path d="M-53 82V-74q0-7 7-7h92q7 0 7 7V82Z" fill="currentColor" stroke="#172535" stroke-width="3"/>
+      <circle cx="37" cy="4" r="8" fill="#fff" fill-opacity=".5" stroke="#172535" stroke-width="3"/>
+    </g>
+  </defs>
+  <rect width="2000" height="1125" fill="#fff"/>
+  <rect x="142" y="177" width="1715" height="901" fill="#fbfdfe" stroke="#172535" stroke-width="7"/>
+  <path d="M314 177V402H828 M486 290H1000V515H142 M828 515V740 M828 628H1171 M1171 177V966 M314 1078V628H657V966 M486 740V966H1000V1078 M657 853H1686V1078 M1515 966V1078 M1343 290V740H1857 M1515 177V515 M1686 177V515" fill="none" stroke="#172535" stroke-width="6" stroke-linejoin="miter"/>
+  <use href="#door" x="228" y="288" color="#de5c59"/>
+  <use href="#door" x="228" y="963" color="#f7f8f9"/>
+  <use href="#door" x="400" y="963" color="#75cc91"/>
+  <use href="#door" x="1600" y="963" color="#75cc91"/>
+  <use href="#door" x="1080" y="745" color="#72a6de"/>
+  <use href="#door" x="1770" y="288" color="#72a6de"/>
+  <use href="#door" x="1080" y="512" color="#e5ce51"/>
+  <use href="#door" x="1770" y="963" color="#e5ce51"/>
+</svg>

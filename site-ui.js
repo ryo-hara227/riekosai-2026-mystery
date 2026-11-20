@@ -3,17 +3,31 @@
  const el=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;};
  const button=(c,text,fn,cls='btn btn--night')=>{const n=el('button',cls,text);n.type='button';n.addEventListener('click',fn);return n;};
  const copy=(target,texts)=>texts.forEach(t=>target.append(el('p','',t)));
- let imageWidth=0,activeLinkTab='mission';
+ let activeLinkTab='mission';
+ function resetImageZoom(){
+  const img=document.getElementById('enlargedImage');
+  img.style.width='100%';
+  img.parentElement.scrollLeft=0;
+  img.parentElement.scrollTop=0;
+ }
  function bind(context){
   const guide=document.getElementById('guideDialog');
   document.querySelectorAll('[data-guide]').forEach(b=>b.addEventListener('click',()=>{const data=HERO_SITE.guides[b.dataset.guide];document.getElementById('guideTitle').textContent=data.title;const body=document.getElementById('guideContents');body.replaceChildren();copy(body,data.text.split('\n\n'));guide.showModal();}));
   document.getElementById('guideClose').addEventListener('click',()=>guide.close());guide.addEventListener('click',e=>{if(e.target===guide)guide.close();});
   const img=document.getElementById('enlargedImage');
-  function resize(w){imageWidth=Math.min(4000,Math.max(300,w));img.style.width=imageWidth+'px';}
-  img.addEventListener('load',()=>{imageWidth=0;img.style.width='100%';});
-  document.getElementById('imageFit').addEventListener('click',()=>{imageWidth=0;img.style.width='100%';});
-  document.getElementById('imageZoomIn').addEventListener('click',()=>resize((imageWidth||img.clientWidth||600)*1.4));
-  document.getElementById('imageZoomOut').addEventListener('click',()=>resize((imageWidth||img.clientWidth||600)/1.4));
+  function resize(factor){
+   const viewport=img.parentElement;
+   const oldWidth=img.clientWidth||viewport.clientWidth||300;
+   const width=Math.min(4000,Math.max(viewport.clientWidth,oldWidth*factor));
+   const focusX=(viewport.scrollLeft+viewport.clientWidth/2)/oldWidth;
+   const focusY=(viewport.scrollTop+viewport.clientHeight/2)/oldWidth;
+   img.style.width=`${width}px`;
+   viewport.scrollLeft=focusX*width-viewport.clientWidth/2;
+   viewport.scrollTop=focusY*width-viewport.clientHeight/2;
+  }
+  document.getElementById('imageFit').addEventListener('click',resetImageZoom);
+  document.getElementById('imageZoomIn').addEventListener('click',()=>resize(1.42));
+  document.getElementById('imageZoomOut').addEventListener('click',()=>resize(1/1.42));
  }
  function flow(page,target,c){
   c.save.flows||={};const solved=c.save.completedPuzzleIds.includes(page.id);const prior=c.save.flows[page.id]||{path:[{node:'01'}],end:null};const f=solved?JSON.parse(JSON.stringify(prior)):prior;if(!solved)c.save.flows[page.id]=f;
@@ -114,7 +128,7 @@
   ];
   rows.forEach(row=>{const tr=el('tr');row.forEach(value=>tr.append(el('td','',value)));body.append(tr);});
   table.append(body);wrap.append(table);
-  target.append(wrap,el('p','prototype-note','比較資料と推理の回答形式は操作試作です。欠陥の設定は承認稿に合わせています。'));
+  target.append(wrap);
   const form=el('form','answer-form');const label=el('label','','何が救援の受理を分けている？');const select=el('select');select.id='reason-policy';label.htmlFor=select.id;[['','選択してください'],['sender','発信者が市民かヒーローかで、SOSの分類先が変わる'],['offline','HERO LINKの通信がすべて停止している'],['place','地下の場所が未登録だから届かない'],['ignored','ヒーローが受信して無視している']].forEach(([v,t])=>select.append(new Option(t,v)));const send=el('button','btn btn--night','記録から指摘する');send.type='submit';const fb=el('p','answer-feedback');fb.setAttribute('role','status');form.append(label,select,send,fb);if(c.save.completedPuzzleIds.includes(page.id)){send.disabled=true;select.disabled=true;select.value='sender';fb.textContent='推理を確認済みです。';}form.addEventListener('submit',e=>{e.preventDefault();if(select.value!=='sender'){fb.textContent='同じSOSでも、発信者区分と分類先が異なる点を比べてください。';return;}c.complete(page.id,['sender']);select.disabled=true;send.disabled=true;fb.textContent='ヒーローの非常用SOSだけが、救援として扱われていません。';fb.classList.add('is-ok');});target.append(form);
  }
  function tabs(target,items,selected,onSelect){const bar=el('nav','extra-tabs');bar.setAttribute('aria-label','HERO LINKの機能');const panel=el('section','link-panel');const controls=[];items.forEach(item=>{const b=button(null,item.label,()=>open(item.id),'');controls.push([item,b]);bar.append(b);});target.append(bar,panel);function open(id){const item=items.find(x=>x.id===id)||items[0];controls.forEach(([a,b])=>b.setAttribute('aria-pressed',String(a.id===item.id)));panel.replaceChildren();activeLinkTab=item.id;onSelect?.(item.id);item.render(panel);}open(selected);}
@@ -128,5 +142,5 @@
   if(c.courseId==='extra'&&c.save.extra?.extensionInstalled)items.push({id:'equipment',label:'装備受信',render:p=>{p.append(el('h3','','装備の近距離信号'),el('p','',c.save.extra.bioConfirmed?'現在の生体信号：確認済み':'現在の生体信号：未確認'),el('p','','点検用信号には正確な位置は含まれません。'));if(c.save.extra.location)p.append(el('p','',c.save.extra.location.name));}});
   tabs(target,items,requested||activeLinkTab,id=>{if(page?.type==='tutorial'&&['notifications','materials'].includes(id))task(c,id);});
  }
- window.HERO_UI={bind,button,flow,tutorial,introDone,normalMission,contact,reason,link};
+ window.HERO_UI={bind,resetImageZoom,button,flow,tutorial,introDone,normalMission,contact,reason,link};
 })();

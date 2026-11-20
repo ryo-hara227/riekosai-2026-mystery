@@ -1,6 +1,6 @@
 /*
- * NORMAL編・編集用シナリオデータ（仮稿）
- * テキスト、ヒント、選択肢、合言葉はここから変更できます。
+ * NORMAL編のシナリオと問題データ。
+ * テキスト、ヒント、選択肢はここから変更できます。
  * 公開後は各ページのidを変えないでください（途中再開に使用）。
  * 正解: N-01 11月29日/15時32分, N-02 C01学園/C02東/C04中央/C06西, N-LAST echo。
  */
@@ -8,7 +8,6 @@ window.HERO_NORMAL = {
   id: 'normal',
   title: '緊急指令！街を守れ！',
   subtitle: 'NORMAL MISSION / 所要時間の目安：約15分',
-  extraKeyword: 'つなぐ', // 仮の合言葉。EXTRAの正式な合言葉が決まったら変更
   rescueRecord: {
     id: 'R-072',
     sender: '市民',
@@ -77,7 +76,6 @@ window.HERO_NORMAL = {
       title: '場所コード',
       prompt: '地名のはじめの漢字を、①〜⑦の語群と組み合わせて言葉を作ろう。語群の番号が地区コードの数字になります。C-01・C-02・C-04・C-06が表す場所を答えてください。',
       image: 'assets/normal/n-02-revision02.png',
-      prototype: '西地区の語の導出は確認中です。現時点では共有された想定の対応で採点しています。',
       fields: [
         { label: 'C-01', answers: ['響ヶ丘学園','響ケ丘学園','ひびきがおかがくえん','学園'], placeholder: '場所の名前' },
         { label: 'C-02', answers: ['東地区','東'], placeholder: '地区名' },
@@ -104,7 +102,6 @@ window.HERO_NORMAL = {
       title: '誰に連絡する？',
       prompt: '現在は15:32。時刻と場所を復元し、4件のうち最も新しい通報があった場所を確認しよう。そこを担当するヒーローを選んでください。',
       image: 'assets/normal/n-log-revision02.svg',
-      note: '※ ヒーローの名前（エコー以外）は仮設定です。画面の「連絡先」は作中設定です。',
       choices: [
         { value: 'volt', label: 'ボルト', description: '中央地区を担当' },
         { value: 'signal', label: 'シグナル', description: '東地区を担当' },

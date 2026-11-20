@@ -5,7 +5,7 @@
     document.body.textContent = '問題データを読み込めませんでした。dataフォルダとスクリプトを確認してください。';
     return;
   }
-  // EASYの保存キーは旧試作と共通のまま維持しています。
+  // 以前の進捗を引き継ぐため、保存キーを維持する。
   const STORAGE_KEYS = { prologue:'hero_prologue_progress_v1', easy: 'hero_easy_progress_v1', normal: 'hero_normal_progress_v1', hard: 'hero_hard_progress_v1', extra:'hero_extra_progress_v1' };
   const gated = p => ['puzzle','flow','hardcode','extra','tutorial','contact'].includes(p.type);
   const memorySaves={};
@@ -28,7 +28,7 @@
   let save = null;
   const course = () => COURSES[courseId];
   const pages = () => course().pages;
-  const defaultSave = id => ({ version:4,...(id==='normal'?{normalCodesVersion:2}:{}), started:false, currentPageId:COURSES[id].pages[0].id, completedPuzzleIds:[], answerEntries:{}, notifications:[],journal:[],cleared:false });
+  const defaultSave = id => ({ version:4,...(id==='normal'?{normalCodesVersion:2}:{}),...(id==='extra'?{extraEvidenceVersion:2}:{}), started:false, currentPageId:COURSES[id].pages[0].id, completedPuzzleIds:[], answerEntries:{}, notifications:[],journal:[],cleared:false });
   function loadSave(id) {
     try {
       const raw = JSON.parse(localStorage.getItem(STORAGE_KEYS[id])||'null')||memorySaves[id];
@@ -44,13 +44,38 @@
         if(raw.normalCodesVersion!==2&&Array.isArray(record.answerEntries['n-02'])){const old=record.answerEntries['n-02'];record.answerEntries['n-02']=[old[3]||'',old[1]||'',old[0]||'',old[2]||''];}
         record.normalCodesVersion=2;
       }
-      if(id==='extra'&&raw.version!==4){record.completedPuzzleIds=record.completedPuzzleIds.filter(x=>!['x-last','x-last-reason'].includes(x));record.extra={...(record.extra||{}),patchApplied:false,location:null,dispatched:false,repairVersion:2};if(raw.cleared||['x-last','x-rescue','x-clear'].includes(raw.currentPageId)){record.currentPageId='x-confront';record.cleared=false;}record.updatedLast=true;}record.version=4;return record;
+      if(id==='extra'){
+        if(raw.version!==4){
+          record.completedPuzzleIds=record.completedPuzzleIds.filter(x=>!['x-last','x-last-reason'].includes(x));
+          record.extra={...(record.extra||{}),patchApplied:false,location:null,dispatched:false,repairVersion:2};
+          if(raw.cleared||['x-last','x-rescue','x-clear'].includes(raw.currentPageId)){
+            record.currentPageId='x-confront';record.cleared=false;
+          }
+        }
+        if(raw.extraEvidenceVersion!==2){
+          const third=record.answerEntries['x-third'];
+          if(Array.isArray(third)&&record.completedPuzzleIds.includes('x-third'))third[2]=COURSES.extra.config.lastDoor;
+          const draft=record.extra?.drafts?.['x-third'];
+          if(draft?.door==='KKC')draft.door=record.completedPuzzleIds.includes('x-third')?COURSES.extra.config.lastDoor:'';
+          if(record.extra?.location?.code===COURSES.extra.config.rescueLocation.code){
+            record.extra.location={...record.extra.location,...COURSES.extra.config.rescueLocation};
+          }
+          delete record.answerEntries['x-unlock'];
+          delete record.extra?.drafts?.['x-unlock'];
+          if(record.currentPageId==='x-unlock')record.currentPageId=COURSES.extra.pages[0].id;
+          record.completedPuzzleIds=record.completedPuzzleIds.filter(pid=>pid!=='x-unlock');
+        }
+        record.extraEvidenceVersion=2;
+      }
+      record.version=4;return record;
     } catch { return memorySaves[id]||defaultSave(id); }
   }
   save = loadSave('easy');
   function persist() { memorySaves[courseId]=save;try { localStorage.setItem(STORAGE_KEYS[courseId], JSON.stringify(save)); } catch {} updateUnread(); }
   function updateUnread(){const count=Object.keys(COURSES).reduce((sum,id)=>sum+(id===courseId?save:loadSave(id)).notifications.filter(n=>!n.read).length,0);const badge=get('unreadBadge');badge.hidden=!count;badge.textContent=count;get('heroLinkBtn').setAttribute('aria-label','HERO LINKを開く'+(count?' 未読'+count+'件':''));}
   function indexForId(id) { const i = pages().findIndex(p => p.id === id); return i >= 0 ? i : 0; }
+  const prerequisiteCourses=['easy','normal','hard'];
+  function extraClearCount(){return prerequisiteCourses.filter(id=>loadSave(id).cleared).length;}
   function goTop() { try { window.scrollTo({ top:0, behavior:'instant' }); } catch {} }
   function navigateHome() {
     window.HERO_EXTRA_UI.cleanup();
@@ -86,9 +111,16 @@
     renderHomeCourse('normal','normalHomeProgress','normalResumeBtn');
     renderHomeCourse('hard','hardHomeProgress','hardResumeBtn');
     renderHomeCourse('extra','extraHomeProgress','extraResumeBtn');
+    const completed=extraClearCount();
+    get('extraStartBtn').disabled=completed<prerequisiteCourses.length;
+    if(get('extraStartBtn').disabled){
+      get('extraResumeBtn').hidden=true;
+      get('extraHomeProgress').textContent=`解放条件：EASY・NORMAL・HARDをクリア（${completed} / ${prerequisiteCourses.length}）`;
+    }
     get('prologueHomeProgress').textContent=loadSave('prologue').cleared?'プロローグ読了 ✓':'はじめての方は、ここから';updateUnread();
   }
   function enterCourse(id, restart) {
+    if(id==='extra'&&extraClearCount()<prerequisiteCourses.length)return;
     if(id!=='prologue'&&!loadSave('prologue').cleared){pendingCourse={id,restart};enterCourse('prologue',false);return;}
     const record=loadSave(id);
     if(restart&&record.started&&!window.confirm(`${id.toUpperCase()}を最初から遊び直しますか？ このコースの解答済み記録もリセットされます。`))return;
@@ -119,21 +151,25 @@
     const frag = document.createDocumentFragment();
     const frame = el('div','puzzle-image-frame');
     const img = el('img');
-    img.src = `./${src}?v=5-rev02`;
+    img.src = `./${src}?v=6`;
     img.alt = `${label}の画像`;
     img.loading = 'eager';
     img.addEventListener('error',()=>{ frame.textContent = `画像が見つかりません：${src}`; });
     frame.appendChild(img); frag.appendChild(frame);
-    if(src.endsWith('.svg')){frame.classList.add('vector-scroll');img.style.width='1200px';img.style.maxWidth='none';const fit=el('button','btn btn--outline','地図を全体表示／原寸表示');fit.type='button';fit.addEventListener('click',()=>{const full=img.style.width==='100%';img.style.width=full?'1200px':'100%';});frag.append(fit,el('p','asset-note','地図は左右・上下に動かせます。原寸表示では文字を大きく読めます。'));}
     const zoom = el('button','image-zoom-btn','⤢ 画像を拡大して見る');
     zoom.type = 'button';
     zoom.addEventListener('click',()=>openImage(src,label));
+    img.addEventListener('click',()=>openImage(src,label));
     frag.appendChild(zoom); return frag;
   }
   function openImage(src,label) {
-    get('enlargedImage').src = `./${src}?v=5-rev02`;
-    get('enlargedImage').alt = `${label}・拡大表示`;
-    if (typeof imageDialog.showModal === 'function') imageDialog.showModal();
+    const image=get('enlargedImage');
+    image.src = `./${src}?v=6`;
+    image.alt = `${label}・拡大表示`;
+    if (typeof imageDialog.showModal === 'function') {
+      if(!imageDialog.open)imageDialog.showModal();
+      window.HERO_UI.resetImageZoom();
+    }
     else window.open(`./${src}`,'_blank','noopener');
   }
   function renderStory(page,target) {
@@ -251,20 +287,10 @@
   }
   function renderClear(target) {
     const wrap=el('div','clear-view');
-    wrap.append(el('div','clear-burst','★'));
     wrap.append(el('h2','',`${courseId.toUpperCase()} CLEAR!`));
     const leads={easy:'ミッションクリア！ エコーのバッジを取り戻し、ショーを無事に開催できました。',normal:'ミッションクリア！ 壊れた通信ログを読み解き、最新のSOSをエコーへ届けました。',hard:'ミッションクリア！ 情報の色の異常に気づき、子どもたちの救助につなげました。',extra:'ミッションクリア！ 届かなかった声を受け取り、ヒーローたちの救出につなげました。'};
     wrap.append(el('p','clear-view__lead',leads[courseId]));
-    const award=el('div','award-placeholder');
-    award.append(el('div','award-placeholder__title','MISSION AWARD / 達成の証'));
-    const picture=el('img');picture.src=`./assets/rewards/${courseId}-badge.png`;picture.alt=`${courseId.toUpperCase()} クリアバッジ`;picture.hidden=true;
-    picture.addEventListener('load',()=>{picture.hidden=false;fallback.hidden=true;});
-    picture.addEventListener('error',()=>{picture.hidden=true;fallback.hidden=false;});
-    const fallback=el('div','award-placeholder__fallback',`${courseId.toUpperCase()} BADGE
-デザイン画像を差し替え予定`);
-    award.append(picture,fallback);wrap.append(award);
-    if(courseId!=='extra') {const all=['easy','normal','hard'].every(id=>id===courseId?save.cleared:loadSave(id).cleared);wrap.append(el('p','',all?'3つのミッションをクリアしました。EXTRAが解放されました！':'EASY・NORMAL・HARDをすべてクリアすると、EXTRAが解放されます。'));}
-    else wrap.append(el('p','prototype-note','調整中の謎は、ページ内で仮実装と示しています。物語は現実への帰還まで収録しています。'));
+    if(courseId!=='extra')wrap.append(el('p','',extraClearCount()===prerequisiteCourses.length?'3つのミッションをクリアしました。EXTRAが解放されました！':'EASY・NORMAL・HARDをすべてクリアすると、EXTRAが解放されます。'));
     const actions=el('div','clear-view__actions');
     const home=el('button','btn btn--red','ミッション一覧へ →');home.type='button';home.addEventListener('click',navigateHome);
     actions.append(home);wrap.appendChild(actions);target.appendChild(wrap);
@@ -273,7 +299,7 @@
     window.HERO_EXTRA_UI.cleanup();
     const page=pages()[currentIndex];
     document.body.classList.toggle('is-extra',courseId==='extra');
-    get('courseBadge').textContent=courseId==='prologue'?'PROLOGUE / TUTORIAL':courseId==='extra'?'EXTRA / PROTOTYPE':`${courseId.toUpperCase()} / 15 MIN`;
+    get('courseBadge').textContent=courseId==='prologue'?'PROLOGUE / TUTORIAL':courseId==='extra'?'EXTRA':`${courseId.toUpperCase()} / 15 MIN`;
     get('courseMini').textContent=`HERO MISSION ${({prologue:'00',easy:'01',normal:'02',hard:'03',extra:'04 / AFTER DARK'})[courseId]}`;
     get('playTitle').textContent=course().title;
     get('logBtn').hidden=courseId!=='normal';
@@ -284,7 +310,6 @@
     pagePanel.replaceChildren();
     pagePanel.append(el('span','page-overline',gated(page)?'PUZZLE! / 謎を解こう':page.type==='clear'?'MISSION COMPLETE':'STORY / 物語'));
     pagePanel.append(el('h2','page-title',page.title));
-    if(page.prototype) pagePanel.append(el('p','prototype-note','仮実装：'+page.prototype));
     if (page.type==='story') renderStory(page,pagePanel);
     if (page.type==='puzzle') {if(page.id==='n-last')window.HERO_UI.normalMission(page,pagePanel,extraContext());else renderPuzzle(page,pagePanel);}
     if (page.type==='flow') renderHardMap(page,pagePanel);
@@ -313,7 +338,7 @@
   prevBtn.addEventListener('click',()=>{ if(courseId==='hard'&&pages()[currentIndex].id==='h-rescue'&&(save.answerEntries['h-map-first']||[])[0]==='old'&&(save.answerEntries['h-code-first']||[])[0]==='1129') navigatePage(indexForId('h-code-first')); else navigatePage(currentIndex-1); });
   nextBtn.addEventListener('click',()=>{ if (!nextBtn.disabled&&currentIndex<pages().length-1) navigatePage(courseId==='hard'?nextHardIndex(pages()[currentIndex]):currentIndex+1); });
   get('resetBtn').addEventListener('click',()=>{
-    if (!window.confirm('この端末のEASY・NORMAL・HARD・EXTRAすべてのテスト進捗を消去しますか？')) return;
+    if (!window.confirm('この端末の全ミッションの進捗を消去しますか？')) return;
     Object.values(STORAGE_KEYS).forEach(key=>{ try { localStorage.removeItem(key); } catch {} });Object.keys(memorySaves).forEach(k=>delete memorySaves[k]);
     save=defaultSave(courseId); navigateHome();
   });

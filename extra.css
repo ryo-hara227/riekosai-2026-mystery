@@ -2,8 +2,6 @@
 .mission-card--extra{background:linear-gradient(135deg,#1f3349,#34315c);color:#fff;border-color:#1d2b40}
 .mission-card--extra .mission-pill{background:#c5e5f1;color:#162c42}.mission-card--extra .mission-card__progress{color:#ffdf89}
 .btn--night{background:#203d59;color:#fff}.mission-card--extra .btn--night{background:#ffd578;color:#202f46}
-.prototype-tag{display:inline-block;font-size:11px;letter-spacing:.03em;border:1px solid currentColor;border-radius:4px;padding:3px 7px;opacity:.9}
-.prototype-note{font-size:12px;line-height:1.7;border-left:4px solid #b27422;background:#fff0ca;color:#674216;padding:10px 13px;border-radius:4px;margin:0 0 20px}
 .is-extra .background-art:not(.background-art--dots){background:linear-gradient(145deg,#101d2e,#24374b 70%,#34365a)}
 .is-extra .site-header__tag,.is-extra .wordmark{color:#e1edf7}.is-extra .play-banner{background:linear-gradient(110deg,#1d2a43,#49426b)}
 .is-extra .page-panel{background:#f8f8f2}.is-extra .site-footer p,.is-extra .reset-link{color:#d6e1ec}

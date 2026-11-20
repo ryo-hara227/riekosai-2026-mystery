@@ -20,4 +20,18 @@
 .rescue-record-fields dd{margin:0;overflow-wrap:anywhere}
 .rescue-record-history{list-style:none;padding:0;margin:0}
 .rescue-record-history li{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:12px;padding:9px 0;border-top:1px solid #d7e5ed;line-height:1.65}
+.puzzle-image-frame img{cursor:zoom-in}
+.image-dialog{width:min(96vw,1250px);max-height:94dvh;overflow:hidden}
+.image-dialog[open]{display:grid;grid-template-rows:auto auto minmax(0,1fr)}
+.image-dialog .image-pan{max-height:calc(94dvh - 135px);overflow:auto;overscroll-behavior:contain;touch-action:pan-x pan-y pinch-zoom}
+.image-dialog .image-pan img{display:block;max-width:none;max-height:none;width:100%;height:auto;object-fit:initial}
+.image-dialog-controls .btn,.image-zoom-btn,.extra-maze-toolbar .btn{min-height:44px}
+.extra-maze-stage{min-width:0}
+.extra-maze-stage.is-zoomed{width:190%;min-width:760px}
+.extra-maze-stage.is-panning{touch-action:pan-x pan-y pinch-zoom}
+.extra-maze-stage.is-panning .extra-maze-ink{pointer-events:none}
+.extra-maze-stage.is-panning .extra-warp{pointer-events:none}
+.extra-maze-toolbar .btn[aria-pressed="true"]{background:#193e56;color:white}
+.extra-warp:not(.is-paired):after{content:none}
+@media(max-width:730px){.image-dialog{padding:8px}.image-dialog-controls{gap:6px}.extra-maze-toolbar .btn{font-size:13px;flex:1 1 auto}.extra-maze-stage:not(.is-zoomed) .extra-warp:after{font-size:13px;padding:0 2px}}
 @media(max-width:730px){.cover__description{font-size:18px}.contact-channel{padding:12px}.contact-channel-head{align-items:flex-start}.contact-bubble{max-width:94%;padding:12px}.extra-file-instruction{padding:22px 12px}}
