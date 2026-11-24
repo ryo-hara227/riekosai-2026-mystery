@@ -28,7 +28,10 @@
   let save = null;
   const course = () => COURSES[courseId];
   const pages = () => course().pages;
-  const defaultSave = id => ({ version:4,...(id==='normal'?{normalCodesVersion:2}:{}),...(id==='extra'?{extraEvidenceVersion:2}:{}), started:false, currentPageId:COURSES[id].pages[0].id, completedPuzzleIds:[], answerEntries:{}, notifications:[],journal:[],cleared:false });
+  const defaultSave = id => ({ version:4,...(id==='normal'?{normalCodesVersion:2}:{}),...(id==='extra'?{extraEndingVersion:1}:{}), started:false, currentPageId:COURSES[id].pages[0].id, completedPuzzleIds:[], answerEntries:{}, notifications:[],journal:[],cleared:false });
+  function rememberPageImage(record,page) {
+    if(page.image&&page.type!=='flow'&&!record.journal.some(a=>a.src===page.image))record.journal.push({src:page.image,title:page.imageLabel||page.title});
+  }
   function loadSave(id) {
     try {
       const raw = JSON.parse(localStorage.getItem(STORAGE_KEYS[id])||'null')||memorySaves[id];
@@ -38,34 +41,33 @@
         notifications:Array.isArray(raw.notifications)?raw.notifications:[],journal:Array.isArray(raw.journal)?raw.journal:[],
         answerEntries: raw.answerEntries && typeof raw.answerEntries === 'object' && !Array.isArray(raw.answerEntries) ? raw.answerEntries : {}
       };
-      if(id==='easy')record.notifications=record.notifications.map(n=>n.id==='e-after-01'?{...n,title:HERO_STORY.notices['e-after-01'].message,body:HERO_STORY.notices['e-after-01'].body}:n);
+      record.notifications=record.notifications.map(n=>{
+        const notice=HERO_STORY.notices[n.id];
+        return notice?{...n,title:notice.message,body:notice.body||notice.message}:n;
+      });
       if(id==='normal'){
         record.journal=record.journal.map(a=>a.src==='assets/normal/n-last.png'?{...a,src:'assets/normal/n-log-revision02.svg'}:a.src==='assets/normal/n-02.png'?{...a,src:'assets/normal/n-02-revision02.png'}:a);
         if(raw.normalCodesVersion!==2&&Array.isArray(record.answerEntries['n-02'])){const old=record.answerEntries['n-02'];record.answerEntries['n-02']=[old[3]||'',old[1]||'',old[0]||'',old[2]||''];}
         record.normalCodesVersion=2;
       }
-      if(id==='extra'){
-        if(raw.version!==4){
-          record.completedPuzzleIds=record.completedPuzzleIds.filter(x=>!['x-last','x-last-reason'].includes(x));
-          record.extra={...(record.extra||{}),patchApplied:false,location:null,dispatched:false,repairVersion:2};
-          if(raw.cleared||['x-last','x-rescue','x-clear'].includes(raw.currentPageId)){
-            record.currentPageId='x-confront';record.cleared=false;
-          }
+      if(id==='hard'){
+        const hardPages=COURSES.hard.pages;
+        const comparisonIndex=hardPages.findIndex(p=>p.id==='h-ready');
+        if(comparisonIndex>=0&&hardPages.findIndex(p=>p.id===record.currentPageId)>=comparisonIndex)rememberPageImage(record,hardPages[comparisonIndex]);
+      }
+      if(id==='extra'&&raw.extraEndingVersion!==1){
+        const retired=['x-third','x-survival','x-last-reason','x-last','x-unlock'];
+        record.completedPuzzleIds=record.completedPuzzleIds.filter(pid=>!retired.includes(pid));
+        retired.forEach(pid=>delete record.answerEntries[pid]);
+        const {drafts={},firstTab,evidenceTab,maze}=record.extra||{};
+        record.extra={drafts:{...drafts},firstTab,evidenceTab,maze};
+        retired.forEach(pid=>delete record.extra.drafts[pid]);
+        if(['x-investigate-intro','x-relay','x-survival','x-survival-story'].includes(raw.currentPageId))record.currentPageId='x-third';
+        if(raw.cleared||['x-last-reason','x-last','x-unlock','x-rescue','x-thanks','x-return','x-epilogue','x-clear'].includes(raw.currentPageId)){
+          record.currentPageId='x-confront';
+          record.cleared=false;
+          record.notifications=record.notifications.filter(n=>n.id!=='x-rescue');
         }
-        if(raw.extraEvidenceVersion!==2){
-          const third=record.answerEntries['x-third'];
-          if(Array.isArray(third)&&record.completedPuzzleIds.includes('x-third'))third[2]=COURSES.extra.config.lastDoor;
-          const draft=record.extra?.drafts?.['x-third'];
-          if(draft?.door==='KKC')draft.door=record.completedPuzzleIds.includes('x-third')?COURSES.extra.config.lastDoor:'';
-          if(record.extra?.location?.code===COURSES.extra.config.rescueLocation.code){
-            record.extra.location={...record.extra.location,...COURSES.extra.config.rescueLocation};
-          }
-          delete record.answerEntries['x-unlock'];
-          delete record.extra?.drafts?.['x-unlock'];
-          if(record.currentPageId==='x-unlock')record.currentPageId=COURSES.extra.pages[0].id;
-          record.completedPuzzleIds=record.completedPuzzleIds.filter(pid=>pid!=='x-unlock');
-        }
-        record.extraEvidenceVersion=2;
       }
       record.version=4;return record;
     } catch { return memorySaves[id]||defaultSave(id); }
@@ -78,7 +80,6 @@
   function extraClearCount(){return prerequisiteCourses.filter(id=>loadSave(id).cleared).length;}
   function goTop() { try { window.scrollTo({ top:0, behavior:'instant' }); } catch {} }
   function navigateHome() {
-    window.HERO_EXTRA_UI.cleanup();
     document.body.classList.remove('is-extra');
     playScreen.hidden = true;
     homeScreen.hidden = false;
@@ -91,7 +92,7 @@
     if (pages()[currentIndex].type === 'clear') save.cleared = true;
     const page=pages()[currentIndex];
     if(page.notification&&!save.notifications.some(n=>n.id===page.id))save.notifications.push({id:page.id,title:page.notification.message,body:page.notification.body||page.notification.message,read:false});
-    if(page.image&&page.type!=='flow'&&!save.journal.some(a=>a.src===page.image))save.journal.push({src:page.image,title:page.imageLabel||page.title});
+    rememberPageImage(save,page);
     if(page.id==='p-03'&&!save.notifications.some(n=>n.id==='p-welcome'))save.notifications.push({id:'p-welcome',title:'マネージャーより：ようこそ、響ヶ丘学園祭へ',body:'通知はこの一覧に残ります。連絡先を確認しました。',read:false});
     persist();
     homeScreen.hidden = true;
@@ -151,7 +152,7 @@
     const frag = document.createDocumentFragment();
     const frame = el('div','puzzle-image-frame');
     const img = el('img');
-    img.src = `./${src}?v=6`;
+    img.src = `./${src}?v=6.2`;
     img.alt = `${label}の画像`;
     img.loading = 'eager';
     img.addEventListener('error',()=>{ frame.textContent = `画像が見つかりません：${src}`; });
@@ -164,7 +165,7 @@
   }
   function openImage(src,label) {
     const image=get('enlargedImage');
-    image.src = `./${src}?v=6`;
+    image.src = `./${src}?v=6.2`;
     image.alt = `${label}・拡大表示`;
     if (typeof imageDialog.showModal === 'function') {
       if(!imageDialog.open)imageDialog.showModal();
@@ -296,7 +297,6 @@
     actions.append(home);wrap.appendChild(actions);target.appendChild(wrap);
   }
   function renderPage() {
-    window.HERO_EXTRA_UI.cleanup();
     const page=pages()[currentIndex];
     document.body.classList.toggle('is-extra',courseId==='extra');
     get('courseBadge').textContent=courseId==='prologue'?'PROLOGUE / TUTORIAL':courseId==='extra'?'EXTRA':`${courseId.toUpperCase()} / 15 MIN`;

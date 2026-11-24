@@ -16,16 +16,27 @@
  n.paragraphs=n.paragraphs.slice(0,at);delete n.image;
  HERO_NORMAL.pages.splice(1,0,{id:'n-tutorial',type:'tutorial',tutorial:'normal',label:'N-00 / HERO LINK',title:'声を届ける準備',paragraphs:tutorial},{id:'n-alert',type:'story',label:'N-00 / 緊急通信',title:'読めない通信ログ',paragraphs:rest,image:'assets/normal/n-log-revision02.svg'});
  HERO_NORMAL.pages.find(p=>p.id==='n-dispatch').type='contact';
- HERO_HARD.pages.find(p=>p.id==='h-ready').note='小問は同じページで切り替わります。選択履歴から前の小問を見直せます。';
+ const comparison={image:'assets/hard/corridor-camera-comparison.png',imageLabel:'通路の標識と監視カメラの比較'};
+ const hardReady=HERO_HARD.pages.find(p=>p.id==='h-ready');
+ Object.assign(hardReady,comparison,{note:'小問は同じページで切り替わります。選択履歴から前の小問を見直せます。'});
+ Object.assign(HERO_HARD.pages.find(p=>p.id==='h-failure'),comparison);
  HERO_HARD.pages.find(p=>p.id==='h-retry-intro').note='同じ小問を、赤と緑を補正してもう一度たどってください。';
  HERO_HARD.pages.filter(p=>p.type==='map').forEach(p=>{p.type='flow';p.prompt='小問の答えを2択から選び、最後に着いた建物を報告してください。選択した経路は保存されます。';p.hints=['赤から緑の向きで読み、意味が通る方を選びます。監視画像の色と、実際に見た色の関係も確認しましょう。','H1-08では、直前の問題画像のインク汚れに戻って確かめてください。前の小問へ戻ることができます。'];});
  const story=(id,title,paras,label='EXTRA / STORY')=>({id,type:'story',title,paragraphs:paras,label});
  const old=Object.fromEntries(HERO_EXTRA.pages.map(p=>[p.id,{...p}]));
  old['x-first'].paragraphs=S.ex.mail;old['x-first'].title='消えた数字、4つのFile';
- old['x-survival'].paragraphs=S.ex.survival.slice(0,5);
- old['x-last'].paragraphs=S.ex.repair;
- HERO_EXTRA.pages=[{...story('x-opening','後夜祭を前に',S.ex.opening),notification:{system:'HERO LINK',...S.notices['x-opening']}},old['x-first'],old['x-first-door'],story('x-door-story','赤い扉の向こう',S.ex.door),story('x-control','最後の扉',S.ex.control),old['x-second'],old['x-documents'],story('x-investigate-intro','記録をつなぐ',S.ex.investigation),old['x-third'],story('x-relay','地図の先',S.ex.afterInvestigation),old['x-survival'],story('x-survival-story','……生きてる！',S.ex.survival),story('x-confront','かつてのヒーロー',S.ex.confrontation),{id:'x-last-reason',type:'extra',scene:'reason',label:'EX-LAST / 記録の比較',title:'届かなかった声',paragraphs:S.ex.reason},old['x-last'],{...story('x-rescue','今度は、届いた',S.ex.rescue),notification:{system:'HERO LINK',...S.notices['x-rescue']}},story('x-thanks','あなたのヒーロー',S.ex.thanks),story('x-return','帰り道',S.ex.return),story('x-epilogue','もうひとつの学園祭へ',S.ex.epilogue),old['x-clear']];
- HERO_EXTRA.config.repairVersion=2;
+ old['x-last'].paragraphs=S.ex.unlock;
+ HERO_EXTRA.pages=[
+  {...story('x-opening','後夜祭を前に',S.ex.opening),notification:{system:'HERO LINK',...S.notices['x-opening']}},
+  old['x-first'],old['x-first-door'],story('x-door-story','赤い扉の向こう',S.ex.door),
+  story('x-control','制御室の地図',S.ex.control),old['x-second'],old['x-documents'],
+  story('x-third','装備保管室へ',S.ex.investigation,'EX-03 / Third Mission'),
+  story('x-confront','かつてのヒーロー',S.ex.confrontation),
+  old['x-last'],
+  {...story('x-rescue','今度は、届いた',S.ex.rescue),notification:{system:'HERO LINK',...S.notices['x-rescue']}},
+  story('x-thanks','あなたのヒーロー',S.ex.thanks),story('x-return','帰り道',S.ex.return),
+  story('x-epilogue','もうひとつの学園祭へ',S.ex.epilogue),old['x-clear']
+ ];
  HERO_EXTRA.pages.find(p=>p.id==='x-door-story').paragraphs=S.ex.firstResult.concat(S.ex.door);
  window.HERO_SITE={version:6,
   flow:{

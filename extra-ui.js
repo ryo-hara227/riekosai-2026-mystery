@@ -2,8 +2,7 @@
 (() => {
   'use strict';
   const D = window.HERO_EXTRA.config;
-  let timers = [], serial = 0;
-  function cleanup(){ timers.forEach(clearInterval);timers=[]; }
+  let serial = 0;
   function state(c){return c.save.extra||(c.save.extra={drafts:{}});}
   function draft(c,key){const s=state(c);s.drafts||={};return s.drafts[key]||(s.drafts[key]={});}
   function button(c,label,action,cls='btn btn--night'){
@@ -42,8 +41,11 @@
   function hints(c,target,entries){const box=c.el('div','hints');entries.forEach((text,i)=>{const d=c.el('details');d.append(c.el('summary','',`ヒント${i+1}`),c.el('p','',text));box.append(d);});target.append(box);}
   function first(page,target,c){
     page.paragraphs.slice(0,3).forEach(p=>target.append(c.el('p','',p)));
-    const mail=c.el('section','extra-mail');const head=c.el('header');head.append(c.el('strong','','差出人：エコー → マネージャー'),c.el('span','','件名：もし、私と連絡が取れなくなったら'));
-    mail.append(head,c.el('blockquote','','「変な指令が続いてる。もし私と連絡が取れなくなったら、添付の資料を調べて。調べた感じ、File番号と同じ数字が資料から消されてるみたい。今日、手伝ってくれたあの人なら、きっと気づいてくれると思う」'));target.append(mail);
+    const email=HERO_STORY.ex.echoEmail;
+    const mail=c.el('section','extra-mail');const head=c.el('header');head.append(c.el('strong','','差出人：エコー → マネージャー'),c.el('span','','件名：'+email.subject));
+    const body=c.el('blockquote');
+    email.body.forEach(paragraph=>body.append(c.el('p','',paragraph)));
+    mail.append(head,body);target.append(mail);
     page.paragraphs.slice(3).forEach(p=>target.append(c.el('p','',p)));
     const assets=[{id:'A',files:['ex01_1.png']},{id:'B',files:['ex01_2-1.png','ex01_2-2.png']},{id:'C',files:['ex01_3-1.png','ex01_3-2.png']},{id:'D',files:['ex01_4.png']}];
     tabs(c,target,assets.map(a=>({id:a.id,label:'資料 '+a.id,render:panel=>{panel.append(c.el('h3','','添付資料 '+a.id));const stack=c.el('div','extra-image-stack');a.files.forEach((src,i)=>stack.append(c.makeImage('assets/extra/'+src,`資料${a.id} ${i+1}`)));panel.append(stack);}})),'firstTab');
@@ -74,8 +76,8 @@
     const instruction=c.el('section','extra-file-instruction');instruction.append(c.el('h3','','First Mission'),c.el('p','','File-1の File-3の\nFile-2室の File-4扉を開けろ'));target.append(instruction);
     target.append(c.el('p','extra-lead','復元した4つの答えを、指示文へ当てはめよう。'));
     const f=formBase(c,target,page.id);const grid=c.el('div','extra-answers');
-    const loc=field(c,f,'place','向かう場所');const color=field(c,f,'color','開ける扉の実物の色',[{value:'red',label:'赤い扉'},{value:'green',label:'緑の扉'},{value:'blue',label:'青い扉'},{value:'yellow',label:'黄色の扉'}]);grid.append(loc.box,color.box);f.append(grid);submitButton(c,f,'この場所の扉を開ける →');const fb=feedback(c);f.append(fb);
-    f.addEventListener('submit',e=>{e.preventDefault();if(good(c,loc.input.value,['旧校舎地下機械室','旧校舎の地下の機械室','旧校舎地下の機械室'])&&color.input.value==='red'){c.complete(page.id,[loc.input.value,color.input.value]);lockForm(c,page,f,fb,'赤い扉が開いた。図面にない制御室へ進めます。');}else fb.textContent='File-1・3・2・4の順で指示を読み直してください。場所は建物名から、色は実物の色で答えます。';});lockForm(c,page,f,fb);
+    const loc=field(c,f,'place','向かう場所');const color=field(c,f,'color','調べる扉の実物の色',[{value:'red',label:'赤い扉'},{value:'green',label:'緑の扉'},{value:'blue',label:'青い扉'},{value:'yellow',label:'黄色の扉'}]);grid.append(loc.box,color.box);f.append(grid);submitButton(c,f,'行き先を報告する →');const fb=feedback(c);f.append(fb);
+    f.addEventListener('submit',e=>{e.preventDefault();if(good(c,loc.input.value,['旧校舎地下機械室','旧校舎の地下の機械室','旧校舎地下の機械室'])&&color.input.value==='red'){c.complete(page.id,[loc.input.value,color.input.value]);lockForm(c,page,f,fb,'行き先と扉の色を特定しました。');}else fb.textContent='File-1・3・2・4の順で指示を読み直してください。場所は建物名から、色は実物の色で答えます。';});lockForm(c,page,f,fb);
   }
   function maze(page,target,c){
     target.append(c.el('p','extra-lead','白い入口から出発。同じ色の扉を使い、壁を越えずに出口を探そう。'));
@@ -154,59 +156,149 @@
     table(c,p,['対象','旧校舎へ入った時刻','中継器の順','最終接続時刻'],D.routes,'装備接続の記録');
     p.append(c.makeImage('assets/extra/basement-map.svg','旧校舎地下・設備通信図'));
   }
-  function investigation(page,target,c,inLink=false){
-    if(!inLink)target.append(c.el('p','extra-lead','通信ログ、扉の記録、地下の図面を照合して、エコーの足取りを報告しよう。'));
-    tabs(c,target,[{id:'directives',label:'指令履歴',render:p=>directivePanel(c,p)},{id:'doors',label:'扉の開閉時刻',render:p=>doorPanel(c,p)},{id:'routes',label:'通信経路・地下図',render:p=>routePanel(c,p)}],'evidenceTab');
-    if(inLink)return;
-    const f=formBase(c,target,page.id);f.append(c.el('h3','','3つの記録を統合する'));const grid=c.el('div','extra-answers');
-    const a=field(c,f,'command','エコーへの最後の指令番号');const b=field(c,f,'relay','全員に共通する最後の中継器番号');const d=field(c,f,'door','エコーの最終接続時刻と一致する扉',D.doors.map(x=>({value:x.code,label:x.code})));grid.append(a.box,b.box,d.box);f.append(grid);
-    const finding=field(c,f,'finding','記録から読み取れること',[{value:'false',label:'未受付の旧校舎要請が繰り返され、応答が途絶えた'},{value:'normal',label:'正式な要請だけが記録されている'},{value:'dead',label:'応答がないので生存していないと断定できる'}]);f.append(finding.box);submitButton(c,f,'調査結果を報告する →');const fb=feedback(c);f.append(fb);
-    f.addEventListener('submit',e=>{e.preventDefault();if(good(c,a.input.value,[D.lastCommand,D.lastCommand.replace('H-','')])&&good(c,b.input.value,[D.finalRelay,'9'])&&d.input.value===D.lastDoor&&finding.input.value==='false'){c.complete(page.id,[a.input.value,b.input.value,d.input.value,finding.input.value]);lockForm(c,page,f,fb,'旧校舎地下の同じ設備系統に集まっていた。次は、現在の生存を確認しよう。');}else fb.textContent='照合結果に一致しない項目があります。最後の指令、共通の中継器、最終接続時刻をそれぞれ確認してください。';});lockForm(c,page,f,fb);
+  function renderEvidence(target,c){
+    tabs(c,target,[
+      {id:'directives',label:'指令履歴',render:p=>directivePanel(c,p)},
+      {id:'doors',label:'扉の開閉時刻',render:p=>doorPanel(c,p)},
+      {id:'routes',label:'通信経路・地下図',render:p=>routePanel(c,p)}
+    ],'evidenceTab');
+  }
+
+  function unlock(page,target,c){
+    page.paragraphs.forEach(t=>target.append(c.el('p','',t)));
+    target.append(c.makeImage(page.image,page.imageLabel));
+    target.append(button(c,'HERO LINKで過去の資料を開く',()=>c.openLink('materials'),'btn btn--outline'));
+
+    const alphabet='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const size=D.unlockCode.length;
+    const step=360/alphabet.length;
+    const wrap=index=>((index%alphabet.length)+alphabet.length)%alphabet.length;
+    const progress=draft(c,page.id);
+    let selected=Number.isInteger(progress.selected)?wrap(progress.selected):0;
+    let letters=Array.isArray(progress.letters)?progress.letters.filter(x=>/^[A-Z]$/.test(x)).slice(0,size):[];
+    let solved=completed(c,page);
+    if(solved)letters=[...D.unlockCode];
+
+    const f=formBase(c,target,page.id);
+    f.classList.add('unlock-form');
+    const slots=c.el('output','unlock-slots');
+    slots.setAttribute('aria-label','確定した文字');
+    slots.setAttribute('aria-live','polite');
+    const position=c.el('p','unlock-position');
+    position.setAttribute('aria-live','polite');
+    const controls=c.el('div','unlock-controls');
+    const lower=button(c,'前の文字',()=>change(selected-1),'btn btn--outline');
+    const higher=button(c,'次の文字',()=>change(selected+1),'btn btn--outline');
+    const confirm=button(c,'文字を確定',()=>{
+      if(solved||letters.length>=size)return;
+      letters.push(alphabet[selected]);fb.textContent='';persist();paint();
+    });
+    const back=button(c,'1文字戻す',()=>{
+      if(solved||!letters.length)return;
+      selected=alphabet.indexOf(letters.pop());fb.textContent='';persist();paint();
+    },'btn btn--outline');
+    const submit=submitButton(c,controls,'扉を解錠する');
+    controls.prepend(lower,higher,confirm,back);
+    const fb=feedback(c);
+    if(solved){fb.textContent='解錠済みです。扉が開きました。';fb.classList.add('is-ok');}
+
+    const ns='http://www.w3.org/2000/svg';
+    function shape(tag,attrs,parent){
+      const item=document.createElementNS(ns,tag);
+      Object.entries(attrs).forEach(([name,value])=>item.setAttribute(name,String(value)));
+      parent.append(item);
+      return item;
+    }
+    const svg=c.el('div','unlock-dial');
+    const face=shape('svg',{viewBox:'0 0 260 260','aria-hidden':'true'},svg);
+    shape('circle',{cx:130,cy:130,r:111,class:'unlock-dial-base'},face);
+    const wheel=shape('g',{},face);
+    [...alphabet].forEach((letter,i)=>{
+      const radians=i*step*Math.PI/180;
+      const x=130+91*Math.sin(radians),y=130-91*Math.cos(radians);
+      const label=shape('text',{x,y,transform:'rotate('+i*step+' '+x+' '+y+')'},wheel);
+      label.textContent=letter;
+    });
+    shape('circle',{cx:130,cy:130,r:56,class:'unlock-dial-hub'},face);
+    const current=shape('text',{x:130,y:132,class:'unlock-dial-letter'},face);
+    shape('path',{d:'M 130,32 L 122,16 L 138,16 Z',class:'unlock-dial-marker'},face);
+
+    f.prepend(c.el('h3','','英字のダイヤル'),c.el('p','','ダイヤルを回し、上の目印に合わせた文字を1つずつ確定してください。'),slots,svg,position);
+    f.append(controls,fb);
+    function persist(){progress.selected=selected;progress.letters=letters.slice();c.persist();}
+    function change(index){
+      if(solved)return;
+      selected=wrap(index);fb.textContent='';persist();paint();
+    }
+    function paint(){
+      wheel.setAttribute('transform','rotate('+(-selected*step)+' 130 130)');
+      current.textContent=alphabet[selected];
+      position.textContent='目印の文字：'+alphabet[selected]+' ／ 確定 '+letters.length+' / '+size;
+      slots.replaceChildren(...Array.from({length:size},(_,i)=>c.el('span','',letters[i]||'–')));
+      lower.disabled=higher.disabled=solved;
+      confirm.disabled=solved||letters.length>=size;
+      back.disabled=solved||letters.length===0;
+      submit.disabled=solved||letters.length!==size;
+      if(solved)submit.textContent='解錠済み ✓';
+    }
+    let drag=null;
+    function pointerAngle(event){
+      const rect=svg.getBoundingClientRect();
+      const x=event.clientX-rect.left-rect.width/2;
+      const y=event.clientY-rect.top-rect.height/2;
+      return Math.hypot(x,y)<rect.width*.14?null:Math.atan2(x,-y)*180/Math.PI;
+    }
+    svg.addEventListener('pointerdown',event=>{
+      if(solved||drag||event.button!==0)return;
+      const angle=pointerAngle(event);
+      if(angle===null)return;
+      drag={id:event.pointerId,angle,start:selected,total:0,moved:false};
+      svg.setPointerCapture?.(event.pointerId);
+    });
+    svg.addEventListener('pointermove',event=>{
+      if(event.pointerId!==drag?.id)return;
+      const angle=pointerAngle(event);
+      if(angle===null)return;
+      drag.total+=((angle-drag.angle+540)%360)-180;
+      drag.angle=angle;
+      drag.moved ||= Math.abs(drag.total)>4;
+      selected=wrap(drag.start-Math.round(drag.total/step));
+      paint();
+    });
+    function finish(event){
+      if(event.pointerId!==drag?.id)return;
+      const angle=pointerAngle(event);
+      if(event.type==='pointerup'&&!drag.moved&&angle!==null)selected=wrap(drag.start+Math.round(angle/step));
+      drag=null;
+      persist();paint();
+    }
+    ['pointerup','pointercancel','lostpointercapture'].forEach(type=>svg.addEventListener(type,finish));
+    f.addEventListener('submit',event=>{
+      event.preventDefault();
+      if(solved||letters.length!==size)return;
+      const answer=letters.join('');
+      if(answer!==D.unlockCode){
+        fb.textContent='扉は開きません。文字の読み方と順番を見直してください。';
+        return;
+      }
+      solved=true;
+      persist();
+      c.complete(page.id,[answer]);
+      fb.classList.add('is-ok');
+      fb.textContent='解錠。目の前の扉が開きました。';
+      paint();
+    });
+    paint();
     hints(c,target,[
-      'エコーへ送られた指令は一つではありません。送信時刻を比べてください。',
-      '接続履歴の矢印を最後まで追い、共通する中継器を設備図で確認しましょう。',
-      '扉ログの数字は指令室で見た表示と同じです。各桁の黒い部分と空白を入れ替えましょう。空白の桁も数えます。読みづらいときは、まず分の部分を照合してみましょう。'
+      '時計と、四角い表示。それぞれと同じ形が、これまでのミッションにも出てきました。',
+      '時計はHARDのH1-07を見返しましょう。針が指す数字を、あの文字盤の同じ位置にある文字へ置き換えます。一つの時計の針は、どれも同じ文字を指します。',
+      '四角い表示はNORMALの表示エラーと同じです。黒い部分と白い部分を入れ替え、見えた形を英字として読んでみましょう。',
+      '時計、四角い表示、時計、四角い表示。用紙の左から順に並べます。'
     ]);
   }
-  function survival(page,target,c){
-    const s=state(c);target.append(c.el('p','','制御室には、装備点検用の近距離信号を受信する端末がある。HERO LINKに、一時的な受信拡張を追加できそうだ。'));
-    target.append(c.el('p','extra-footer-note','受信機は1台。点検信号は装備ID・生体情報・更新番号を含みますが、距離・方向・正確な位置情報は含みません。'));
-    const term=c.el('section','extra-terminal');term.append(c.el('h3','','EQUIPMENT MONITOR / LOCAL RX'));
-    const install=button(c,s.extensionInstalled?'受信拡張は導入済み ✓':'近距離通信拡張を導入する',()=>{s.extensionInstalled=true;c.persist();install.disabled=true;install.textContent='受信拡張を導入しました ✓';start.disabled=false;});install.disabled=Boolean(s.extensionInstalled);term.append(install);
-    const start=button(c,'近距離信号の受信を開始',()=>{start.disabled=true;sample();const timer=setInterval(sample,1800);timers.push(timer);});start.disabled=!s.extensionInstalled;term.append(start);
-    const samples=c.el('div');term.append(samples);const stat=c.el('p','extra-signal-status','待機中 / 位置情報：取得不可');term.append(stat);const fb=feedback(c);const confirm=button(c,'更新された生体信号を確認する',()=>{if(!s.extensionInstalled||sessionSamples<2)return;s.bioConfirmed=true;c.complete(page.id,['current-bio-confirmed']);fb.textContent='……生きてる！ エコーも、ほかのみんなも。次へ進めます。';fb.classList.add('is-ok');confirm.disabled=true;});confirm.disabled=true;
-    let sessionSamples=0;
-    function draw(){samples.replaceChildren();const seq=s.signalSequence||0;const seconds=20*3600+40*60+seq*2;const clock=[Math.floor(seconds/3600)%24,Math.floor(seconds/60)%60,seconds%60].map(n=>String(n).padStart(2,'0')).join(':');table(c,samples,['装備ID','対応するヒーロー','心拍','更新番号'],D.heartbeats.map((h,i)=>[h.id,h.hero,String(h.bpm+(seq+i)%3-1)+' bpm','#'+seq]),'現在の装備点検信号');stat.textContent='● 受信時刻 '+clock+' / 位置情報：取得不可';}
-    function sample(){if(!term.isConnected)return;s.signalSequence=(s.signalSequence||0)+1;sessionSamples++;c.persist();draw();confirm.disabled=sessionSamples<2||completed(c,page);}
-    if(s.signalSequence)draw();target.append(term,c.el('p','extra-footer-note','受信を始めると約2秒ごとに更新番号が進みます。2回の更新で、保存済みの記録ではないことを確認してください。'),confirm,fb);
-    if(completed(c,page)){confirm.disabled=true;fb.textContent='現在の生体信号を確認済みです。正確な位置はまだ取得できていません。';fb.classList.add('is-ok');}
-  }
-  function repair(page,target,c){
-    const s=state(c);(page.paragraphs||[]).forEach(t=>target.append(c.el('p','',t)));
-    const log=c.el('section','extra-terminal');log.append(c.el('h3','','SOS分類の診断ログ'),c.el('output','','送信元：EQ-01（エコー）\n発信者区分：ヒーロー\n信号：非常用SOS\n現在の分類先：装備異常の記録\n救援受付：未受理\n通常の隊員通信：動作中'));target.append(log);
-    const f=formBase(c,target,page.id);const fields=c.el('div','extra-settings');
-    const policy=field(c,f,'policy','非常用SOSを救援として扱う発信者',[{value:'citizen',label:'市民だけを対象にする'},{value:'all',label:'市民・ヒーローの両方を対象にする'},{value:'hero',label:'ヒーローだけを対象にする'}]);
-    const dest=field(c,f,'dest','ヒーローの非常用SOSの分類先',[{value:'equipment',label:'装備異常の記録だけに残す'},{value:'rescue',label:'救援受付で受理し、担当者へ通知する'},{value:'none',label:'記録を削除する'}]);
-    const reply=field(c,f,'reply','救援受付後の位置照会をどうする？',[{value:'request',label:'元の送信装備へ返信し、位置情報を要求する'},{value:'guess',label:'最後の中継器から現在地を推定して確定する'},{value:'off',label:'位置照会を行わない'}]);fields.append(policy.box,dest.box,reply.box);f.append(fields);const apply=submitButton(c,f,'修正案を検証して適用する');const fb=feedback(c);f.append(fb);
-    const result=c.el('section');target.append(result);
-    f.addEventListener('submit',e=>{e.preventDefault();if(s.patchApplied)return;if(!c.save.completedPuzzleIds.includes('x-last-reason')){fb.textContent='先に、前のページで過去と現在の記録を比較してください。';return;}if(policy.input.value!=='all'||dest.input.value!=='rescue'||reply.input.value!=='request'){fb.textContent='助ける側も、助けを必要とします。ヒーローの非常用SOSが救援として受理される扱いにしてください。';return;}s.patchApplied=true;s.repairVersion=2;c.persist();showState();});
-    function showState(){result.replaceChildren();if(!s.patchApplied)return;f.querySelectorAll('input,select,button').forEach(x=>x.disabled=true);apply.textContent='修正を適用済み ✓';fb.textContent='ヒーローの非常用SOSが救援受付に現れ、受理番号が発行されました。';fb.classList.add('is-ok');
-      const box=c.el('div','extra-receipt');box.append(c.el('h3','','救援受付 / 受理済み'),c.el('p','','EQ-01：非常用SOS → 救援受付 → 受理番号発行 → 担当者へ通知'));
-      HERO_STORY.ex.receiptReady.forEach(t=>box.append(c.el('p','',t)));
-      if(!s.location){const request=button(c,'送信元装備へ正式な位置情報を要求する',()=>{request.disabled=true;HERO_STORY.ex.receiptRequest.forEach(t=>box.append(c.el('p','',t)));status.textContent='受付完了 → 位置照会を返信 → 応答を照合中…';const timer=setTimeout(()=>{if(!box.isConnected)return;s.location={...D.rescueLocation,receivedAt:'20:45:12',source:'EQ-01 / 返信された設備位置ID'};c.persist();showState();},700);timers.push(timer);});const status=c.el('p','extra-footer-note','近距離点検信号ではなく、救援通信への返信経路を使います。');box.append(request,status);}
-      else {box.append(c.el('p','location-code',s.location.code),c.el('p','',s.location.name),c.el('p','','到達経路：'+s.location.route),c.el('p','extra-footer-note','取得元：'+s.location.source+' / 受信時刻 '+s.location.receivedAt));
-        if(!s.dispatched)box.append(button(c,'位置情報と救出経路を救助班へ送る',()=>{s.dispatched=true;c.complete(page.id,[s.location.code,'rescue-dispatched']);showState();}));
-        else box.append(c.el('p','','✓ 救助班が位置情報を受領しました。次へ進めます。'));
-      }
-      const narrative=s.dispatched?HERO_STORY.ex.receiptLocation.concat(HERO_STORY.ex.receiptDispatch):s.location?HERO_STORY.ex.receiptLocation:HERO_STORY.ex.receiptRequest;
-      if(s.location)narrative.forEach(t=>box.append(c.el('p','',t)));
-      result.append(box);
-    }showState();
-    hints(c,target,['通信そのものは動いています。市民とヒーローでSOSの分類先が異なることが問題です。','ヒーローのSOSも救援受付で受理し、担当者へ通知します。そのあとで正式な位置照会を行います。']);
-  }
   function render(page,target,c){
-    const scenes={first,firstDoor,maze,documents,investigation,survival,repair,reason:(p,t,c)=>HERO_UI.reason(p,t,c)};
+    const scenes={first,firstDoor,maze,documents,unlock};
     scenes[page.scene](page,target,c);
   }
-  window.HERO_EXTRA_UI={render,cleanup,renderEvidence:(target,c)=>investigation({id:'x-third'},target,c,true)};
+  window.HERO_EXTRA_UI={render,renderEvidence};
 })();

@@ -100,7 +100,7 @@ window.HERO_NORMAL = {
     {
       id: 'n-last', type: 'puzzle', label: 'N-LAST / 最後の指令',
       title: '誰に連絡する？',
-      prompt: '現在は15:32。時刻と場所を復元し、4件のうち最も新しい通報があった場所を確認しよう。そこを担当するヒーローを選んでください。',
+      prompt: 'ログ取得時刻は15:32。4件の通報の時刻と場所を復元し、まだ担当が決まっていない通報のうち、最も新しいものを確認しよう。その場所を担当するヒーローを選んでください。',
       image: 'assets/normal/n-log-revision02.svg',
       choices: [
         { value: 'volt', label: 'ボルト', description: '中央地区を担当' },

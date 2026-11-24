@@ -10,15 +10,8 @@ window.HERO_EXTRA = {
       {code:'AWI',work:'青を生きる',color:'blue',label:'青'},
       {code:'KKC',work:'黄身加熱中',color:'yellow',label:'黄'}
     ],
-    secondDoor:'APF', lastCommand:'H-114', finalRelay:'09', lastDoor:'APF',
-    rescueLocation:{code:'HB-UG-09',name:'響ヶ丘学園 旧校舎 B1・第09区画／装備保管室',route:'地下機械室 → 隠し制御室 → APFの扉 → 作業室 → 東側保守通路 → 装備保管室'},
-    heartbeats:[
-      {id:'EQ-01',hero:'エコー',bpm:78}, {id:'EQ-02',hero:'パワー',bpm:76},
-      {id:'EQ-03',hero:'フレイム',bpm:82}, {id:'EQ-04',hero:'レーナ',bpm:74},
-      {id:'EQ-05',hero:'サージ',bpm:80}, {id:'EQ-06',hero:'ステラ',bpm:75},
-      {id:'EQ-07',hero:'グラント',bpm:86}, {id:'EQ-08',hero:'ルクス',bpm:79},
-      {id:'EQ-09',hero:'ノヴァ',bpm:83}, {id:'EQ-10',hero:'ヴェイル',bpm:77}
-    ],
+    secondDoor:'APF',
+    unlockCode:'HERO',
     directives:[
       ['H-100','緊急','エコー','指令室から会場付近の不審者対応を指示','応答あり・会場周辺の安全確認完了','R-100','15:32'],
       ['H-101','緊急','セイル','学園祭会場','一般人の安全確保完了','R-101','15:41'],
@@ -49,7 +42,6 @@ window.HERO_EXTRA = {
       ['ヴェイル','18:53','03 → 08 → 09','19:00']
     ],
     plan:[
-      {text:'変身バッジの回収（失敗）'},
       {text:'通信網のハッキング',done:true},
       {text:'監視カメラ網のハッキング',done:true},
       {text:'虚偽通報でヒーローを集める'},
@@ -59,35 +51,11 @@ window.HERO_EXTRA = {
     recording:['【録音開始】','エコー「……おかしい。ここに残ってる指令、正式な受付記録がないものばかり……？」','「まさか、みんなが向かった場所って……」','（物音）','「誰！？ そこにいるの！？」','（雑音）','「待って！ 話を――」','【大きな衝撃音／録音中断】']
   },
   pages:[
-    {id:'x-opening',type:'story',label:'EX-00 / プロローグ',title:'後夜祭の灯りが、消えた',paragraphs:[
-      '2026年11月29日。響ヶ丘学園祭の後夜祭。子どもたちの救出を終え、ようやく街に笑顔が戻り始めた。',
-      'ところが、HERO LINKに届くのは、応答のない出動記録ばかりだった。パワー、フレイム、レーナ。そして、エコーまで。',
-      '「ヒーローたちと連絡が取れない……」',
-      '駆けつけたエコーのマネージャーが、あなたに自分の端末を見せた。',
-      '「失踪する直前、エコーからメールが来たんです。HERO LINKじゃなくて、私宛てに。あなたなら、この続きがわかるかもしれないって」'
-    ],notification:{system:'HERO LINK / 緊急',message:'複数のヒーローが応答なし'}},
     {id:'x-first',type:'extra',scene:'first',label:'EX-01 / First Mission',title:'エコーが残した、4つのヒント'},
     {id:'x-first-door',type:'extra',scene:'firstDoor',label:'EX-01 / 目的地',title:'旧校舎の地下へ'},
-    {id:'x-control',type:'story',label:'EX-02 / Second Mission',title:'図面にない制御室',paragraphs:[
-      '旧校舎の地下機械室。赤い扉を開くと、図面には載っていない制御室が現れた。',
-      'その奥には、同じ色の扉が対になった不思議なフロアが広がっている。机にはエコーの手描きの地図と、短いメモが残されていた。',
-      '「入口は白。同じ色の扉は、離れた場所へつながる。文字を追って、最後に入る扉を選んで」',
-      'この地図は、エコーが直接残した資料だ。監視映像ではないため、地図上の扉の色は入れ替わっていない。'
-    ]},
-    {id:'x-second',type:'extra',scene:'maze',label:'EX-02 / ワープ迷路',title:'最後に入る扉を探せ'},
+    {id:'x-second',type:'extra',scene:'maze',label:'EX-02 / ワープ迷路',title:'作業室へ続く扉を探せ'},
     {id:'x-documents',type:'extra',scene:'documents',label:'EX-02 / 発見した資料',title:'ヒーロー消滅計画'},
-    {id:'x-third',type:'extra',scene:'investigation',label:'EX-03 / Third Mission',title:'消えたヒーローを追え'},
-    {id:'x-survival',type:'extra',scene:'survival',label:'EX-03 / 装備点検信号',title:'……生きてる！'},
-    {id:'x-last',type:'extra',scene:'repair',label:'EX-LAST / 通信経路の修正',title:'誰かの声を、受け取るために'},
-    {id:'x-rescue',type:'story',label:'EX-ED / 救出',title:'今度は、届いた',paragraphs:[
-      '『こちら救助班。正式な位置情報を受領。旧校舎地下の保守通路に入る！』',
-      '『扉が開いた。……全員を確認！ ヒーローたちは無事だ！』',
-      '少し遅れて、聞き慣れた声が端末から響いた。',
-      '『……見つけてくれたんだね。ありがとう。私たちのヒーロー』',
-      'あなたは、日記をそっと閉じた。あの日、声が届かなかった人のことも、このままにはできない。',
-      '救助班に、その人の保護と安全確認も依頼した。誰もが助けを求められる仕組みを、ここから作り直そう。',
-      'みんなのヒーローにはなれなくても。誰かの声に、気づくことはできる。'
-    ]},
+    {id:'x-last',type:'extra',scene:'unlock',label:'EX-LAST / LAST Mission',title:'装備保管室を解錠せよ',image:'assets/extra/last-unlock.png',imageLabel:'犯人が残した最後の謎'},
     {id:'x-clear',type:'clear',label:'EX-CLEAR',title:'MISSION COMPLETE!'}
   ]
 };
